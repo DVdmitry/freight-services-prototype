@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import type { NavigateFunction } from 'react-router-dom';
-import { Briefcase, Sparkles, Brain, Settings, LogOut, Bot, Globe } from 'lucide-react';
+import { Briefcase, Settings, LogOut, Bot, Globe } from 'lucide-react';
 import type { User } from '@/shared/types/user';
 import clsx from 'clsx';
 
