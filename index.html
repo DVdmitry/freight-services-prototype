@@ -8,6 +8,19 @@
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Конфигурация виджета (опционально) -->
+<!--    <script>-->
+<!--      window.aiFormCopilotConfig = {-->
+<!--        position: { bottom: 20, right: 20 },-->
+<!--        zIndex: 999999-->
+<!--      };-->
+<!--    </script>-->
+
+    <!-- Виджет загружается ПЕРВЫМ -->
+    <script type="module" src="https://ai-form-copilot.web.app/widget-build/index.js"></script>
+
+    <!-- React приложение -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

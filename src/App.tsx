@@ -1,3 +1,4 @@
+import type {} from './web-components.d.ts';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Package, Truck, DollarSign, Menu, X, Heart, Building, MapPin, Star, BookOpen, MessageSquare, Coffee, Rocket, Code, Palette, Brain, Shield, Clock, HeadphonesIcon, Search, User, Phone, Mail, Facebook, Linkedin, Twitter, ArrowRight, Thermometer, Box, Zap, Navigation, CheckCircle, AlertCircle, Bell, Copy, Sun, Moon, Sparkles, Activity, Globe2, Cpu, Layers, Calendar, LogOut, BarChart3, TrendingUp, Users, Award, Briefcase, Send } from 'lucide-react';
 
@@ -341,7 +342,7 @@ const TransEdgeFreightApp = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<string>('home');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userType, setUserType] = useState<string>(''); // 'user' or 'admin'
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
@@ -1124,487 +1125,573 @@ const TransEdgeFreightApp = () => {
     );
   };
 
-  const OrderPlacementPage = ({ 
-    theme, 
-    orderStepRef: propOrderStepRef, 
-    orderDataRef: propOrderDataRef, 
-    onOrder 
-  }: ThemedPageProps) => {
-    // Используем useState для принудительного ререндера, так как изменение ref.current не вызывает его
-    const [, forceUpdate] = useState(0);
-    const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null); // ПЕРЕМЕЩЕНО СЮДА
-  
-    // Убедимся, что используем правильные refs. 
-    // Если они не переданы, компонент не будет работать корректно в связке с App.tsx.
-    if (!propOrderStepRef || !propOrderDataRef) {
-      console.error("OrderPlacementPage: orderStepRef or orderDataRef is not provided!");
-      return <div className={`pt-32 min-h-screen ${theme.bg.primary} text-red-500`}>Error: Missing order state references.</div>;
-    }
-    
-    const orderStep = propOrderStepRef;
-    const orderData = propOrderDataRef;
-  
-    const setStep = (newStep: number) => {
-      orderStep.current = newStep;
-      forceUpdate(prev => prev + 1); 
-    };
-  
-    const handleInputChange = (field: keyof OrderData, value: string | boolean) => {
-      orderData.current = { ...orderData.current, [field]: value };
-      forceUpdate(prev => prev + 1); 
-    };
-  
-    const calculatePrice = () => {
-      const basePrice = parseFloat(orderData.current.weight || '0') * 2.5;
-      const serviceMultiplier: {[key: string]: number} = {
-        'ftl': 1.2,
-        'ltl': 0.8,
-        'refrigerated': 1.5,
-        'oversized': 2.0,
-        'expedited': 2.5
-      };
-      const multiplier = serviceMultiplier[orderData.current.serviceType] || 1;
-      const extras = (orderData.current.insurance ? 100 : 0) + 
-                    (orderData.current.packaging ? 50 : 0) + 
-                    (orderData.current.loading ? 75 : 0) + 
-                    (orderData.current.storage ? 200 : 0);
-      
-      const total = parseFloat((basePrice * multiplier + extras).toFixed(2));
-      setEstimatedPrice(total);
-    };
-  
-    const cargoTypes = [
-      { value: 'standard', label: 'Standard Cargo', icon: <Package className="w-5 h-5" /> },
-      { value: 'fragile', label: 'Fragile Items', icon: <AlertCircle className="w-5 h-5" /> },
-      { value: 'hazardous', label: 'Hazardous Materials', icon: <AlertCircle className="w-5 h-5" /> },
-      { value: 'perishable', label: 'Perishable Goods', icon: <Thermometer className="w-5 h-5" /> }
-    ];
-  
-    const serviceTypes = [
-      { value: 'ftl', label: 'Full Truck Load (FTL)', description: 'Dedicated truck, fastest delivery' },
-      { value: 'ltl', label: 'Less Than Truckload (LTL)', description: 'Shared space, economical' },
-      { value: 'refrigerated', label: 'Refrigerated Transport', description: 'Temperature-controlled' },
-      { value: 'oversized', label: 'Oversized Cargo', description: 'Special equipment' },
-      { value: 'expedited', label: 'Expedited Freight', description: 'Urgent delivery' }
-    ];
-  
-    const additionalServices = [
-      { value: 'insurance' as keyof OrderData, label: 'Cargo Insurance', price: '$100', description: 'Full coverage protection' },
-      { value: 'packaging' as keyof OrderData, label: 'Professional Packaging', price: '$50', description: 'Secure packaging service' },
-      { value: 'loading' as keyof OrderData, label: 'Loading/Unloading', price: '$75', description: 'Professional handling' },
-      { value: 'storage' as keyof OrderData, label: 'Temporary Storage', price: '$200', description: 'Up to 7 days storage' }
-    ];
-  
-    const steps = [
-      { number: 1, title: 'Cargo Details', icon: <Package className="w-5 h-5" /> },
-      { number: 2, title: 'Locations & Dates', icon: <MapPin className="w-5 h-5" /> },
-      { number: 3, title: 'Service Selection', icon: <Truck className="w-5 h-5" /> },
-      { number: 4, title: 'Review & Confirm', icon: <CheckCircle className="w-5 h-5" /> }
-    ];
+    const OrderPlacementPage = ({
+                                  theme,
+                                  orderStepRef: propOrderStepRef,
+                                  orderDataRef: propOrderDataRef,
+                                  onOrder
+                                }: ThemedPageProps) => {
+      const [, forceUpdate] = useState(0);
+      const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
 
-    return (
-      <div className={`pt-32 min-h-screen ${theme.bg.primary}`}>
-        {/* фоновые круги */}
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/3 left-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
-        </div>
-  
-        <div className="container mx-auto px-4 py-12 relative z-10">
-          <div className="max-w-5xl mx-auto">
-            {/* Заголовок */}
-            <div className="text-center mb-12">
-              <h1 className={`text-5xl md:text-6xl font-bold ${theme.text.primary} mb-6`}>
-                Place Your{' '}
-                <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-                  Order
-                </span>
-              </h1>
-              <p className={`text-xl ${theme.text.secondary}`}>
-                Complete the form below to get an instant quote and book your shipment
-              </p>
-            </div>
-  
-            {/* Шаги-индикатор */}
-            <div className="mb-12">
-              <div className="flex items-center justify-between max-w-3xl mx-auto">
-                {steps.map((step, index) => (
-                  <div key={step.number} className="flex items-center">
-                    <div
-                      className={`flex flex-col items-center ${
-                        orderStep.current >= step.number ? 'text-violet-600' : theme.text.muted
-                      }`}
-                    >
-                      <div
-                        className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
-                          orderStep.current >= step.number
-                            ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white'
-                            : `${theme.bg.card} border-2 ${theme.border.card}`
-                        }`}
-                      >
-                        {orderStep.current > step.number ? <CheckCircle className="w-6 h-6" /> : step.icon}
-                      </div>
-                      <span
-                        className={`text-sm font-medium hidden md:block ${
-                          orderStep.current >= step.number ? theme.text.primary : theme.text.muted
-                        }`}
-                      >
-                        {step.title}
-                      </span>
-                    </div>
-                    {index < steps.length - 1 && (
-                      <div
-                        className={`w-20 md:w-32 h-1 mx-2 ${
-                          orderStep.current > step.number ? 'bg-violet-600' : theme.bg.card
-                        }`}
-                      />
-                    )}
-                  </div>
-                ))}
+      if (!propOrderStepRef || !propOrderDataRef) {
+        console.error("OrderPlacementPage: orderStepRef or orderDataRef is not provided!");
+        return (
+          <div className={`pt-32 min-h-screen ${theme.bg.primary} text-red-500`}>
+            Error: Missing order state references.
+          </div>
+        );
+      }
+
+      const orderStep = propOrderStepRef;
+      const orderData = propOrderDataRef;
+
+      const setStep = (newStep: number) => {
+        const clamped = Math.max(1, Math.min(4, newStep));
+        orderStep.current = clamped;
+        // автосчёт цены при переходе на обзор
+        if (clamped === 4) calculatePrice();
+        forceUpdate(prev => prev + 1);
+      };
+
+      const handleInputChange = (field: keyof OrderData, value: string | boolean) => {
+        orderData.current = { ...orderData.current, [field]: value };
+        forceUpdate(prev => prev + 1);
+      };
+
+      const calculatePrice = () => {
+        const weightStr = (orderData.current.weight as any) ?? '0';
+        const weight = parseFloat(weightStr as string);
+        const safeWeight = Number.isFinite(weight) ? weight : 0;
+
+        const serviceMultiplier: { [k: string]: number } = {
+          ftl: 1.2,
+          ltl: 0.8,
+          refrigerated: 1.5,
+          oversized: 2.0,
+          expedited: 2.5
+        };
+        const multiplier = serviceMultiplier[orderData.current.serviceType as string] ?? 1;
+
+        const extras =
+          (orderData.current.insurance ? 100 : 0) +
+          (orderData.current.packaging ? 50 : 0) +
+          (orderData.current.loading ? 75 : 0) +
+          (orderData.current.storage ? 200 : 0);
+
+        const basePrice = safeWeight * 2.5;
+        const total = Number(((basePrice * multiplier) + extras).toFixed(2));
+        setEstimatedPrice(total);
+      };
+
+      const cargoTypes = [
+        { value: 'standard', label: 'Standard Cargo', icon: <Package className="w-5 h-5" /> },
+        { value: 'fragile', label: 'Fragile Items', icon: <AlertCircle className="w-5 h-5" /> },
+        { value: 'hazardous', label: 'Hazardous Materials', icon: <AlertCircle className="w-5 h-5" /> },
+        { value: 'perishable', label: 'Perishable Goods', icon: <Thermometer className="w-5 h-5" /> }
+      ];
+
+      const serviceTypes = [
+        { value: 'ftl', label: 'Full Truck Load (FTL)', description: 'Dedicated truck, fastest delivery' },
+        { value: 'ltl', label: 'Less Than Truckload (LTL)', description: 'Shared space, economical' },
+        { value: 'refrigerated', label: 'Refrigerated Transport', description: 'Temperature-controlled' },
+        { value: 'oversized', label: 'Oversized Cargo', description: 'Special equipment' },
+        { value: 'expedited', label: 'Expedited Freight', description: 'Urgent delivery' }
+      ];
+
+      const additionalServices = [
+        { value: 'insurance' as keyof OrderData, label: 'Cargo Insurance', price: '$100', description: 'Full coverage protection' },
+        { value: 'packaging' as keyof OrderData, label: 'Professional Packaging', price: '$50', description: 'Secure packaging service' },
+        { value: 'loading' as keyof OrderData, label: 'Loading/Unloading', price: '$75', description: 'Professional handling' },
+        { value: 'storage' as keyof OrderData, label: 'Temporary Storage', price: '$200', description: 'Up to 7 days storage' }
+      ];
+
+      const steps = [
+        { number: 1, title: 'Cargo Details', icon: <Package className="w-5 h-5" /> },
+        { number: 2, title: 'Locations & Dates', icon: <MapPin className="w-5 h-5" /> },
+        { number: 3, title: 'Service Selection', icon: <Truck className="w-5 h-5" /> },
+        { number: 4, title: 'Review & Confirm', icon: <CheckCircle className="w-5 h-5" /> }
+      ];
+
+      return (
+        <div className={`pt-32 min-h-screen ${theme.bg.primary}`}>
+          {/* фоновые круги */}
+          <div className="fixed inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1/3 left-0 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-1/3 right-0 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
+          </div>
+
+          <div className="container mx-auto px-4 py-12 relative z-10">
+            <div className="max-w-5xl mx-auto">
+              {/* Заголовок */}
+              <div className="text-center mb-12">
+                <h1 className={`text-5xl md:text-6xl font-bold ${theme.text.primary} mb-6`}>
+                  Place Your{' '}
+                  <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+                Order
+              </span>
+                </h1>
+                <p className={`text-xl ${theme.text.secondary}`}>
+                  Complete the form below to get an instant quote and book your shipment
+                </p>
               </div>
-            </div>
-  
-            {/* Карточка формы */}
-            <div
-              className={`${theme.bg.card} backdrop-blur-xl rounded-3xl p-8 md:p-12 border ${theme.border.card}`}
-            >
-              {/* STEP 1 ------------------------------------------------ */}
-              {orderStep.current === 1 && (
-                <>
-                  <h2 className={`text-2xl font-bold ${theme.text.primary} mb-6`}>Cargo Information</h2>
-  
-                  {/* Cargo type */}
-                  <div className="mb-6">
-                    <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
-                      Cargo Type
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      {cargoTypes.map((type) => (
+
+              {/* Шаги-индикатор */}
+              <div className="mb-12">
+                <div className="flex items-center justify-between max-w-3xl mx-auto">
+                  {steps.map((step, index) => (
+                    <div key={step.number} className="flex items-center">
+                      <div
+                        className={`flex flex-col items-center ${
+                          orderStep.current >= step.number ? 'text-violet-600' : theme.text.muted
+                        }`}
+                      >
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 ${
+                            orderStep.current >= step.number
+                              ? 'bg-gradient-to-br from-violet-600 to-indigo-600 text-white'
+                              : `${theme.bg.card} border-2 ${theme.border.card}`
+                          }`}
+                        >
+                          {orderStep.current > step.number ? <CheckCircle className="w-6 h-6" /> : step.icon}
+                        </div>
+                        <span
+                          className={`text-sm font-medium hidden md:block ${
+                            orderStep.current >= step.number ? theme.text.primary : theme.text.muted
+                          }`}
+                        >
+                      {step.title}
+                    </span>
+                      </div>
+                      {index < steps.length - 1 && (
+                        <div
+                          className={`w-20 md:w-32 h-1 mx-2 ${
+                            orderStep.current > step.number ? 'bg-violet-600' : theme.bg.card
+                          }`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Карточка формы */}
+              <div className={`${theme.bg.card} backdrop-blur-xl rounded-3xl p-8 md:p-12 border ${theme.border.card}`}>
+                {/* STEP 1 ------------------------------------------------ */}
+                {orderStep.current === 1 && (
+                  <>
+                    <h2 className={`text-2xl font-bold ${theme.text.primary} mb-6`}>Cargo Information</h2>
+
+                    {/* Cargo type */}
+                    <div className="mb-6">
+                      <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
+                        Cargo Type
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {cargoTypes.map((type) => (
+                          <button
+                            key={type.value}
+                            type="button"
+                            onClick={() => handleInputChange('cargoType', type.value)}
+                            className={`p-4 rounded-xl border-2 transition-all duration-300 ${
+                              orderData.current.cargoType === type.value
+                                ? 'border-violet-600 bg-violet-600/10'
+                                : `${theme.border.card} hover:border-violet-600/50`
+                            }`}
+                          >
+                            <div
+                              className={`${
+                                orderData.current.cargoType === type.value ? 'text-violet-600' : theme.text.secondary
+                              }`}
+                            >
+                              {type.icon}
+                            </div>
+                            <p className={`mt-2 text-sm font-medium ${theme.text.primary}`}>{type.label}</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Dimensions */}
+                    <div className="mb-6">
+                      <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
+                        Cargo Dimensions & Weight
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className={`block text-xs ${theme.text.muted} mb-1`}>Weight (lbs)</label>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            step="any"
+                            placeholder="e.g., 1500"
+                            value={orderData.current.weight ?? ''}
+                            onChange={(e) => handleInputChange('weight', e.target.value)}
+                            className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs ${theme.text.muted} mb-1`}>Length (in)</label>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            step="any"
+                            placeholder="e.g., 48"
+                            value={orderData.current.length ?? ''}
+                            onChange={(e) => handleInputChange('length', e.target.value)}
+                            className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs ${theme.text.muted} mb-1`}>Width (in)</label>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            step="any"
+                            placeholder="e.g., 40"
+                            value={orderData.current.width ?? ''}
+                            onChange={(e) => handleInputChange('width', e.target.value)}
+                            className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                        <div className="col-span-2 md:col-span-1">
+                          <label className={`block text-xs ${theme.text.muted} mb-1`}>Height (in)</label>
+                          <input
+                            type="number"
+                            inputMode="decimal"
+                            min={0}
+                            step="any"
+                            placeholder="e.g., 40"
+                            value={orderData.current.height ?? ''}
+                            onChange={(e) => handleInputChange('height', e.target.value)}
+                            className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Special instructions */}
+                    <div className="mb-8">
+                      <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
+                        Special Instructions (Optional)
+                      </label>
+                      <textarea
+                        placeholder="Any special handling requirements or notes..."
+                        value={orderData.current.specialInstructions ?? ''}
+                        onChange={(e) => handleInputChange('specialInstructions', e.target.value)}
+                        rows={3}
+                        className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                      />
+                    </div>
+
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
+                      >
+                        Continue to Locations
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* STEP 2 ------------------------------------------------ */}
+                {orderStep.current === 2 && (
+                  <>
+                    <h2 className={`text-2xl font-bold ${theme.text.primary} mb-8`}>
+                      Pickup & Delivery Details
+                    </h2>
+
+                    <div className="space-y-6 mb-8">
+                      <div>
+                        <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
+                          Pickup Address
+                        </label>
+                        <div className="relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <MapPin className={`w-5 h-5 ${theme.text.muted}`} />
+                      </span>
+                          <input
+                            type="text"
+                            placeholder="Enter pickup location"
+                            value={orderData.current.pickupAddress ?? ''}
+                            onChange={(e) => handleInputChange('pickupAddress', e.target.value)}
+                            className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
+                          Delivery Address
+                        </label>
+                        <div className="relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <MapPin className={`w-5 h-5 ${theme.text.muted}`} />
+                      </span>
+                          <input
+                            type="text"
+                            placeholder="Enter delivery destination"
+                            value={orderData.current.deliveryAddress ?? ''}
+                            onChange={(e) => handleInputChange('deliveryAddress', e.target.value)}
+                            className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-6">
+                        <div>
+                          <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
+                            Pickup Date
+                          </label>
+                          <div className="relative">
+                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                          <Calendar className={`w-5 h-5 ${theme.text.muted}`} />
+                        </span>
+                            <input
+                              type="date"
+                              value={orderData.current.pickupDate ?? ''}
+                              onChange={(e) => handleInputChange('pickupDate', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
+                            Pickup Time
+                          </label>
+                          <div className="relative">
+                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                          <Clock className={`w-5 h-5 ${theme.text.muted}`} />
+                        </span>
+                            <input
+                              type="time"
+                              value={orderData.current.pickupTime ?? ''}
+                              onChange={(e) => handleInputChange('pickupTime', e.target.value)}
+                              className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
+                          Preferred Delivery Date (Optional)
+                        </label>
+                        <div className="relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                        <Calendar className={`w-5 h-5 ${theme.text.muted}`} />
+                      </span>
+                          <input
+                            type="date"
+                            value={orderData.current.deliveryDate ?? ''}
+                            onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
+                            className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between mt-10">
+                      <button
+                        type="button"
+                        onClick={() => setStep(1)}
+                        className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
+                      >
+                        Continue to Services
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {/* STEP 3 ------------------------------------------------ */}
+                {orderStep.current === 3 && (
+                  <>
+                    <h2 className={`text-2xl font-bold ${theme.text.primary} mb-6`}>
+                      Select Service Type
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                      {serviceTypes.map((service) => (
                         <button
-                          key={type.value}
-                          onClick={() => handleInputChange('cargoType', type.value)}
-                          className={`p-4 rounded-xl border-2 transition-all duration-300 ${
-                            orderData.current.cargoType === type.value
+                          key={service.value}
+                          type="button"
+                          onClick={() => handleInputChange('serviceType', service.value)}
+                          className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
+                            (orderData.current.serviceType as string) === service.value
                               ? 'border-violet-600 bg-violet-600/10'
                               : `${theme.border.card} hover:border-violet-600/50`
                           }`}
                         >
-                          <div
-                            className={`${
-                              orderData.current.cargoType === type.value ? 'text-violet-600' : theme.text.secondary
-                            }`}
-                          >
-                            {type.icon}
-                          </div>
-                          <p className={`mt-2 text-sm font-medium ${theme.text.primary}`}>{type.label}</p>
+                          <h4 className={`font-semibold text-lg mb-1 ${theme.text.primary}`}>{service.label}</h4>
+                          <p className={`${theme.text.secondary} text-sm`}>{service.description}</p>
                         </button>
                       ))}
                     </div>
-                  </div>
-  
-                  {/* Dimensions */}
-                  <div className="mb-6">
-                    <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
-                      Cargo Dimensions & Weight
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      <div>
-                       <label className={`block text-xs ${theme.text.muted} mb-1`}>Weight (lbs)</label>
-                        <input type="number" placeholder="e.g., 1500" value={orderData.current.weight} onChange={(e) => handleInputChange('weight', e.target.value)} className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`} />
-                      </div>
-                      <div>
-                        <label className={`block text-xs ${theme.text.muted} mb-1`}>Length (in)</label>
-                        <input type="number" placeholder="e.g., 48" value={orderData.current.length} onChange={(e) => handleInputChange('length', e.target.value)} className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`} />
-                      </div>
-                      <div>
-                        <label className={`block text-xs ${theme.text.muted} mb-1`}>Width (in)</label>
-                        <input type="number" placeholder="e.g., 40" value={orderData.current.width} onChange={(e) => handleInputChange('width', e.target.value)} className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`} />
-                      </div>
-                      <div className="col-span-2 md:col-span-1">
-                         <label className={`block text-xs ${theme.text.muted} mb-1`}>Height (in)</label>
-                        <input type="number" placeholder="e.g., 40" value={orderData.current.height} onChange={(e) => handleInputChange('height', e.target.value)} className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`} />
-                      </div>
-                    </div>
-                  </div>
-  
-                  {/* Special instructions */}
-                  <div className="mb-8">
-                    <label className={`block text-sm font-medium ${theme.text.primary} mb-3`}>
-                      Special Instructions (Optional)
-                    </label>
-                    <textarea
-                      placeholder="Any special handling requirements or notes..."
-                      value={orderData.current.specialInstructions}
-                      onChange={(e) => handleInputChange('specialInstructions', e.target.value)}
-                      rows={3}
-                      className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                    />
-                  </div>
-  
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => setStep(2)}
-                      className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
-                    >
-                      Continue to Locations
-                    </button>
-                  </div>
-                </>
-              )}
-  
-              {/* STEP 2 ------------------------------------------------ */}
-              {orderStep.current === 2 && (
-                <>
-                  <h2 className={`text-2xl font-bold ${theme.text.primary} mb-8`}>
-                    Pickup & Delivery Details
-                  </h2>
-                  
-                  <div className="space-y-6 mb-8">
-                    <div>
-                      <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
-                        Pickup Address
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                          <MapPin className={`w-5 h-5 ${theme.text.muted}`} />
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="Enter pickup location"
-                          value={orderData.current.pickupAddress}
-                          onChange={(e) => handleInputChange('pickupAddress', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                        />
-                      </div>
-                    </div>
 
-                    <div>
-                      <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
-                        Delivery Address
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                          <MapPin className={`w-5 h-5 ${theme.text.muted}`} />
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="Enter delivery destination"
-                          value={orderData.current.deliveryAddress}
-                          onChange={(e) => handleInputChange('deliveryAddress', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div>
-                        <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
-                          Pickup Date
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                            <Calendar className={`w-5 h-5 ${theme.text.muted}`} />
-                          </span>
-                          <input
-                            type="date"
-                            value={orderData.current.pickupDate}
-                            onChange={(e) => handleInputChange('pickupDate', e.target.value)}
-                            className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
-                          Pickup Time
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                            <Clock className={`w-5 h-5 ${theme.text.muted}`} />
-                          </span>
-                          <input
-                            type="time"
-                            value={orderData.current.pickupTime}
-                            onChange={(e) => handleInputChange('pickupTime', e.target.value)}
-                            className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>
-                        Preferred Delivery Date (Optional)
-                      </label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 transform -translate-y-1/2">
-                          <Calendar className={`w-5 h-5 ${theme.text.muted}`} />
-                        </span>
-                        <input
-                          type="date"
-                          value={orderData.current.deliveryDate}
-                          onChange={(e) => handleInputChange('deliveryDate', e.target.value)}
-                          className={`w-full pl-12 pr-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between mt-10">
-                    <button
-                      onClick={() => setStep(1)}
-                      className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => setStep(3)}
-                      className="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
-                    >
-                      Continue to Services
-                    </button>
-                  </div>
-                </>
-              )}
-  
-              {/* STEP 3 ------------------------------------------------ */}
-              {orderStep.current === 3 && (
-                <>
-                  <h2 className={`text-2xl font-bold ${theme.text.primary} mb-6`}>
-                    Select Service Type
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {serviceTypes.map((service) => (
-                      <button
-                        key={service.value}
-                        onClick={() => handleInputChange('serviceType', service.value)}
-                        className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left ${
-                          orderData.current.serviceType === service.value
-                            ? 'border-violet-600 bg-violet-600/10'
-                            : `${theme.border.card} hover:border-violet-600/50`
-                        }`}
-                      >
-                        <h4 className={`font-semibold text-lg mb-1 ${theme.text.primary}`}>{service.label}</h4>
-                        <p className={`${theme.text.secondary} text-sm`}>{service.description}</p>
-                      </button>
-                    ))}
-                  </div>
-
-                  <h3 className={`text-xl font-bold ${theme.text.primary} mt-10 mb-6`}>Additional Services</h3>
-                  <div className="space-y-4 mb-8">
-                    {additionalServices.map((service) => (
-                      <div 
-                        key={service.value}
-                        className={`${theme.bg.input} p-4 rounded-xl flex items-center justify-between`}
-                      >
-                        <div>
-                          <h4 className={`font-medium ${theme.text.primary}`}>{service.label}</h4>
-                          <p className={`text-sm ${theme.text.muted}`}>{service.description} - <span className="font-semibold text-violet-500">{service.price}</span></p>
-                        </div>
-                        <button
-                          onClick={() => handleInputChange(service.value as keyof OrderData, !orderData.current[service.value as keyof OrderData])}
-                          className={`w-12 h-7 rounded-full transition-colors flex items-center px-1 ${
-                            orderData.current[service.value as keyof OrderData] ? 'bg-violet-600 justify-end' : 'bg-gray-300 dark:bg-gray-700 justify-start'
-                          }`}
+                    <h3 className={`text-xl font-bold ${theme.text.primary} mt-10 mb-6`}>Additional Services</h3>
+                    <div className="space-y-4 mb-8">
+                      {additionalServices.map((service) => (
+                        <div
+                          key={service.value}
+                          className={`${theme.bg.input} p-4 rounded-xl flex items-center justify-between`}
                         >
-                          <span className="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform"></span>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-  
-                  <div className="flex justify-between">
-                    <button
-                      onClick={() => setStep(2)}
-                      className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={() => {
-                        calculatePrice();
-                        setStep(4);
-                      }}
-                      className="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
-                    >
-                      Review Order
-                    </button>
-                  </div>
-                </>
-              )}
-  
-              {/* STEP 4 ------------------------------------------------ */}
-              {orderStep.current === 4 && (
-                <>
-                  <h2 className={`text-2xl font-bold ${theme.text.primary} mb-8`}>Review Your Order</h2>
-  
-                  <div className={`${theme.bg.input} rounded-2xl p-6 mb-8 space-y-4`}>
-                    <div>
-                      <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Cargo Details</h3>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <span className={theme.text.muted}>Cargo Type:</span> <span className={theme.text.primary}>{orderData.current.cargoType || '-'}</span>
-                        <span className={theme.text.muted}>Weight:</span> <span className={theme.text.primary}>{orderData.current.weight ? `${orderData.current.weight} lbs` : '-'}</span>
-                        <span className={theme.text.muted}>Dimensions:</span> <span className={theme.text.primary}>{orderData.current.length && orderData.current.width && orderData.current.height ? `${orderData.current.length}x${orderData.current.width}x${orderData.current.height} in` : '-'}</span>
-                        <span className={theme.text.muted}>Instructions:</span> <span className={`whitespace-pre-wrap ${theme.text.primary}`}>{orderData.current.specialInstructions || '-'}</span>
-                      </div>
-                    </div>
-                    
-                    <hr className={theme.border.primary} />
-
-                    <div>
-                      <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Locations & Dates</h3>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <span className={theme.text.muted}>Pickup:</span> <span className={theme.text.primary}>{orderData.current.pickupAddress || '-'}</span>
-                        <span className={theme.text.muted}>Delivery:</span> <span className={theme.text.primary}>{orderData.current.deliveryAddress || '-'}</span>
-                        <span className={theme.text.muted}>Pickup Date:</span> <span className={theme.text.primary}>{orderData.current.pickupDate || '-'} at {orderData.current.pickupTime || '-'}</span>
-                        <span className={theme.text.muted}>Delivery Date:</span> <span className={theme.text.primary}>{orderData.current.deliveryDate || '-'}</span>
-                      </div>
+                          <div>
+                            <h4 className={`font-medium ${theme.text.primary}`}>{service.label}</h4>
+                            <p className={`text-sm ${theme.text.muted}`}>
+                              {service.description} - <span className="font-semibold text-violet-500">{service.price}</span>
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleInputChange(
+                                service.value as keyof OrderData,
+                                !orderData.current[service.value as keyof OrderData]
+                              )
+                            }
+                            className={`w-12 h-7 rounded-full transition-colors flex items-center px-1 ${
+                              orderData.current[service.value as keyof OrderData]
+                                ? 'bg-violet-600 justify-end'
+                                : 'bg-gray-300 dark:bg-gray-700 justify-start'
+                            }`}
+                            aria-pressed={!!orderData.current[service.value as keyof OrderData]}
+                          >
+                            <span className="w-5 h-5 bg-white rounded-full shadow-md transform transition-transform"></span>
+                          </button>
+                        </div>
+                      ))}
                     </div>
 
-                    <hr className={theme.border.primary} />
+                    <div className="flex justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setStep(2)}
+                        className={`px-8 py-3 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
+                      >
+                        Back
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setStep(4)}
+                        className="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
+                      >
+                        Review Order
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                    <div>
-                      <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Service Details</h3>
-                      <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <span className={theme.text.muted}>Service Type:</span> <span className={theme.text.primary}>{serviceTypes.find(s => s.value === orderData.current.serviceType)?.label || '-'}</span>
-                        <span className={theme.text.muted}>Insurance:</span> <span className={theme.text.primary}>{orderData.current.insurance ? 'Yes' : 'No'}</span>
-                        <span className={theme.text.muted}>Packaging:</span> <span className={theme.text.primary}>{orderData.current.packaging ? 'Yes' : 'No'}</span>
-                        <span className={theme.text.muted}>Loading/Unloading:</span> <span className={theme.text.primary}>{orderData.current.loading ? 'Yes' : 'No'}</span>
-                        <span className={theme.text.muted}>Storage:</span> <span className={theme.text.primary}>{orderData.current.storage ? 'Yes' : 'No'}</span>
+                {/* STEP 4 ------------------------------------------------ */}
+                {orderStep.current === 4 && (
+                  <>
+                    <h2 className={`text-2xl font-bold ${theme.text.primary} mb-8`}>Review Your Order</h2>
+
+                    <div className={`${theme.bg.input} rounded-2xl p-6 mb-8 space-y-4`}>
+                      <div>
+                        <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Cargo Details</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <span className={theme.text.muted}>Cargo Type:</span>
+                          <span className={theme.text.primary}>{orderData.current.cargoType || '-'}</span>
+                          <span className={theme.text.muted}>Weight:</span>
+                          <span className={theme.text.primary}>
+                        {orderData.current.weight ? `${orderData.current.weight} lbs` : '-'}
+                      </span>
+                          <span className={theme.text.muted}>Dimensions:</span>
+                          <span className={theme.text.primary}>
+                        {orderData.current.length && orderData.current.width && orderData.current.height
+                          ? `${orderData.current.length}x${orderData.current.width}x${orderData.current.height} in`
+                          : '-'}
+                      </span>
+                          <span className={theme.text.muted}>Instructions:</span>
+                          <span className={`whitespace-pre-wrap ${theme.text.primary}`}>
+                        {orderData.current.specialInstructions || '-'}
+                      </span>
+                        </div>
+                      </div>
+
+                      <hr className={theme.border.primary} />
+
+                      <div>
+                        <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Locations & Dates</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <span className={theme.text.muted}>Pickup:</span>
+                          <span className={theme.text.primary}>{orderData.current.pickupAddress || '-'}</span>
+                          <span className={theme.text.muted}>Delivery:</span>
+                          <span className={theme.text.primary}>{orderData.current.deliveryAddress || '-'}</span>
+                          <span className={theme.text.muted}>Pickup Date:</span>
+                          <span className={theme.text.primary}>
+                        {orderData.current.pickupDate || '-'} at {orderData.current.pickupTime || '-'}
+                      </span>
+                          <span className={theme.text.muted}>Delivery Date:</span>
+                          <span className={theme.text.primary}>{orderData.current.deliveryDate || '-'}</span>
+                        </div>
+                      </div>
+
+                      <hr className={theme.border.primary} />
+
+                      <div>
+                        <h3 className={`text-lg font-semibold ${theme.text.primary} mb-3`}>Service Details</h3>
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                          <span className={theme.text.muted}>Service Type:</span>
+                          <span className={theme.text.primary}>
+                        {serviceTypes.find(s => s.value === orderData.current.serviceType)?.label || '-'}
+                      </span>
+                          <span className={theme.text.muted}>Insurance:</span>
+                          <span className={theme.text.primary}>{orderData.current.insurance ? 'Yes' : 'No'}</span>
+                          <span className={theme.text.muted}>Packaging:</span>
+                          <span className={theme.text.primary}>{orderData.current.packaging ? 'Yes' : 'No'}</span>
+                          <span className={theme.text.muted}>Loading/Unloading:</span>
+                          <span className={theme.text.primary}>{orderData.current.loading ? 'Yes' : 'No'}</span>
+                          <span className={theme.text.muted}>Storage:</span>
+                          <span className={theme.text.primary}>{orderData.current.storage ? 'Yes' : 'No'}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="text-center mb-8">
-                    <p className={`text-lg ${theme.text.secondary}`}>Estimated Price:</p>
-                    <p className={`text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent`}>
-                      {estimatedPrice !== null ? `$${estimatedPrice.toFixed(2)}` : 'Calculating...'}
-                    </p>
-                    <p className={`text-sm ${theme.text.muted}`}>(Price may vary based on final details)</p>
-                  </div>
-  
-                  <div className="flex flex-col md:flex-row gap-4">
-                    <button
-                      onClick={() => setStep(3)}
-                      className={`flex-1 px-8 py-4 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
-                    >
-                      Back to Services
-                    </button>
-                    <button
-                      onClick={() => onOrder && onOrder()}
-                      className="flex-1 px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
-                    >
-                      Submit Order
-                    </button>
-                  </div>
-                </>
-              )}
+                    <div className="text-center mb-8">
+                      <p className={`text-lg ${theme.text.secondary}`}>Estimated Price:</p>
+                      <p className={`text-4xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent`}>
+                        {estimatedPrice !== null ? `$${estimatedPrice.toFixed(2)}` : 'Calculating...'}
+                      </p>
+                      <p className={`text-sm ${theme.text.muted}`}>(Price may vary based on final details)</p>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-4">
+                      <button
+                        type="button"
+                        onClick={() => setStep(3)}
+                        className={`flex-1 px-8 py-4 ${theme.bg.input} ${theme.text.primary} rounded-xl font-semibold hover:scale-105 transition-all duration-300`}
+                      >
+                        Back to Services
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onOrder && onOrder()}
+                        className="flex-1 px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
+                      >
+                        Submit Order
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
 
   const LoginModal = () => {
     const [loginData, setLoginData] = useState<LoginData>({ email: '', password: '' });
@@ -3229,8 +3316,11 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
     
       
       {showLoginModal && <LoginModal />}
-      
+
       <Footer />
+
+      {/* AI Form Copilot виджет - доступен на всех страницах */}
+      <ai-form-copilot></ai-form-copilot>
     </div>
   );
 
