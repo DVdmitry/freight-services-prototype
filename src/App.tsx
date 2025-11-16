@@ -1,6 +1,7 @@
 import type {} from './web-components.d.ts';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Package, Truck, DollarSign, Menu, X, Heart, Building, MapPin, Star, BookOpen, MessageSquare, Coffee, Rocket, Code, Palette, Brain, Shield, Clock, HeadphonesIcon, Search, User, Phone, Mail, Facebook, Linkedin, Twitter, ArrowRight, Thermometer, Box, Zap, Navigation, CheckCircle, AlertCircle, Bell, Copy, Sun, Moon, Sparkles, Activity, Globe2, Cpu, Layers, Calendar, LogOut, BarChart3, TrendingUp, Users, Award, Briefcase, Send } from 'lucide-react';
+import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { Package, Truck, DollarSign, Menu, X, Heart, Building, MapPin, Star, BookOpen, MessageSquare, Coffee, Rocket, Code, Palette, Brain, Shield, Clock, HeadphonesIcon, Search, User, Phone, Mail, Facebook, Linkedin, Twitter, ArrowRight, Thermometer, Box, Zap, Navigation as NavigationIcon, CheckCircle, AlertCircle, Bell, Copy, Sun, Moon, Sparkles, Activity, Globe2, Cpu, Layers, Calendar, LogOut, BarChart3, TrendingUp, Users, Award, Briefcase, Send } from 'lucide-react';
 
 // Импорт локальных изображений
 import fullTruckLoadImg from './assets/full_truck_load.jpg';
@@ -226,7 +227,7 @@ const TrackShipmentPageComponent = ({ theme, isDarkMode }: { theme: ThemeType, i
                   </div>
                    <div className="absolute top-4 right-4 space-y-2">
                     <button className={`p-3 ${theme.bg.card} backdrop-blur-xl rounded-xl hover:scale-110 transition-transform`}>
-                      <Navigation className="w-5 h-5 text-violet-600" />
+                      <NavigationIcon className="w-5 h-5 text-violet-600" />
                     </button>
                     <button className={`p-3 ${theme.bg.card} backdrop-blur-xl rounded-xl hover:scale-110 transition-transform`}>
                       <Layers className="w-5 h-5 text-violet-600" />
@@ -338,10 +339,10 @@ const TrackShipmentPageComponent = ({ theme, isDarkMode }: { theme: ThemeType, i
 };
 
 const TransEdgeFreightApp = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<string>('home');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userType, setUserType] = useState<string>(''); // 'user' or 'admin'
@@ -366,17 +367,9 @@ const TransEdgeFreightApp = () => {
     storage: false,
     specialInstructions: ''
   });
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
-  const handlePageChange = (page: string) => {
-    setCurrentPage(page);
+  const handlePageChange = (path: string) => {
+    navigate(path);
     setIsMenuOpen(false);
     window.scrollTo(0, 0);
   };
@@ -442,17 +435,28 @@ const TransEdgeFreightApp = () => {
     }
   }), [isDarkMode]);
 
-  const Header = () => (
+  const Header = () => {
+    const [scrolled, setScrolled] = useState<boolean>(false);
+
+    useEffect(() => {
+      const handleScroll = () => {
+        setScrolled(window.scrollY > 50);
+      };
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    return (
     <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      scrolled 
+      scrolled
         ? `${theme.bg.card} backdrop-blur-xl shadow-2xl ${isDarkMode ? 'shadow-purple-500/10' : 'shadow-gray-200'}`
         : 'bg-transparent'
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
-          <div 
+          <div
             className="flex items-center space-x-3 cursor-pointer group"
-            onClick={() => handlePageChange('home')}
+            onClick={() => handlePageChange('/')}
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-2xl blur-xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -468,31 +472,31 @@ const TransEdgeFreightApp = () => {
 
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {['Home', 'Services', 'Track Shipment', 'Order Form', 'Pricing', 'Contact'].map((item) => (
-              <a 
+              <a
                 key={item}
-                href="#" 
-                onClick={(e) => { 
-                  e.preventDefault(); 
-                  if (item === 'Home') handlePageChange('home');
-                  if (item === 'Track Shipment') handlePageChange('track');
-                  if (item === 'Services') handlePageChange('services');
-                  if (item === 'Order Form') handlePageChange('order');
-                  if (item === 'Pricing') handlePageChange('pricing');
-                  if (item === 'Contact') handlePageChange('contact');
-                  if (item === 'About Us') handlePageChange('about');
-                  if (item === 'Careers') handlePageChange('careers');
-                  if (item === 'Blog') handlePageChange('blog');
-                  if (item === 'Schedule a Demo') handlePageChange('demo');
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (item === 'Home') handlePageChange('/');
+                  if (item === 'Track Shipment') handlePageChange('/track');
+                  if (item === 'Services') handlePageChange('/services');
+                  if (item === 'Order Form') handlePageChange('/order');
+                  if (item === 'Pricing') handlePageChange('/pricing');
+                  if (item === 'Contact') handlePageChange('/contact');
+                  if (item === 'About Us') handlePageChange('/about');
+                  if (item === 'Careers') handlePageChange('/careers');
+                  if (item === 'Blog') handlePageChange('/blog');
+                  if (item === 'Schedule a Demo') handlePageChange('/demo');
 
                 }}
                 className={`font-medium relative group ${
-                  (item === 'Home' && currentPage === 'home') || 
-                  (item === 'Track Shipment' && currentPage === 'track') ||
-                  (item === 'Services' && currentPage === 'services') ||
-                  (item === 'Order Form' && currentPage === 'order') ||
-                  (item === 'Pricing' && currentPage === 'pricing') ||
-                  (item === 'Contact' && currentPage === 'contact')
-                    ? 'text-violet-600' 
+                  (item === 'Home' && location.pathname === '/') ||
+                  (item === 'Track Shipment' && location.pathname === '/track') ||
+                  (item === 'Services' && location.pathname === '/services') ||
+                  (item === 'Order Form' && location.pathname === '/order') ||
+                  (item === 'Pricing' && location.pathname === '/pricing') ||
+                  (item === 'Contact' && location.pathname === '/contact')
+                    ? 'text-violet-600'
                     : theme.text.primary
                 }`}
               >
@@ -526,7 +530,7 @@ const TransEdgeFreightApp = () => {
             {isAuthenticated ? (
               <div className="hidden md:flex items-center space-x-4">
                 <button
-                  onClick={() => handlePageChange('dashboard')}
+                  onClick={() => handlePageChange('/dashboard')}
                   className={`flex items-center space-x-2 px-4 py-2.5 ${theme.bg.hover} rounded-xl transition-all duration-300`}
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
@@ -540,7 +544,7 @@ const TransEdgeFreightApp = () => {
                   onClick={() => {
                     setIsAuthenticated(false);
                     setUserType('');
-                    handlePageChange('home');
+                    handlePageChange('/');
                   }}
                   className={`p-2.5 rounded-xl ${theme.bg.hover} transition-all duration-300`}
                 >
@@ -586,19 +590,19 @@ const TransEdgeFreightApp = () => {
             {['Home', 'Services', 'Track Shipment', 'Order Form', 'Pricing', 'Contact', 'About Us', 'Careers', 'Blog', 'Schedule a Demo'].map((item) => (
               <a 
                 key={item}
-                href="#" 
-                onClick={(e) => { 
-                  e.preventDefault(); 
-                  if (item === 'Home') handlePageChange('home');
-                  if (item === 'Track Shipment') handlePageChange('track');
-                  if (item === 'Services') handlePageChange('services');
-                  if (item === 'Order Form') handlePageChange('order');
-                  if (item === 'Pricing') handlePageChange('pricing');
-                  if (item === 'Contact') handlePageChange('contact');
-                  if (item === 'About Us') handlePageChange('about');
-                  if (item === 'Careers') handlePageChange('careers');
-                  if (item === 'Blog') handlePageChange('blog');
-                  if (item === 'Schedule a Demo') handlePageChange('demo');
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (item === 'Home') handlePageChange('/');
+                  if (item === 'Track Shipment') handlePageChange('/track');
+                  if (item === 'Services') handlePageChange('/services');
+                  if (item === 'Order Form') handlePageChange('/order');
+                  if (item === 'Pricing') handlePageChange('/pricing');
+                  if (item === 'Contact') handlePageChange('/contact');
+                  if (item === 'About Us') handlePageChange('/about');
+                  if (item === 'Careers') handlePageChange('/careers');
+                  if (item === 'Blog') handlePageChange('/blog');
+                  if (item === 'Schedule a Demo') handlePageChange('/demo');
                 }}
                 className={`block ${theme.text.primary} hover:text-violet-600 transition-colors font-medium text-lg`}
               >
@@ -608,7 +612,7 @@ const TransEdgeFreightApp = () => {
             {isAuthenticated ? (
               <>
                 <button
-                  onClick={() => handlePageChange('dashboard')}
+                  onClick={() => handlePageChange('/dashboard')}
                   className={`block ${theme.text.primary} hover:text-violet-600 transition-colors font-medium text-lg`}
                 >
                   {userType === 'admin' ? 'Admin Dashboard' : 'Dashboard'}
@@ -617,7 +621,7 @@ const TransEdgeFreightApp = () => {
                     onClick={() => {
                     setIsAuthenticated(false);
                     setUserType('');
-                    handlePageChange('home');
+                    handlePageChange('/');
                     }}
                   className="w-full mt-6 px-6 py-3 bg-red-500 text-white rounded-xl hover:bg-red-600 transition-all"
                   >
@@ -636,7 +640,8 @@ const TransEdgeFreightApp = () => {
                 </div>
       )}
     </header>
-  );
+    );
+  };
 
   const Footer = () => (
     <footer className={`${isDarkMode ? 'bg-gray-900' : 'bg-gray-100'} pt-20 pb-10 relative overflow-hidden`}>
@@ -667,16 +672,16 @@ const TransEdgeFreightApp = () => {
             <ul className="space-y-3">
               {['Home', 'Services', 'Track Shipment', 'Order Form', 'Pricing', 'Schedule a Demo'].map((link) => (
                 <li key={link}>
-                  <a 
-                    href="#" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
-                      if (link === 'Home') handlePageChange('home');
-                      if (link === 'Track Shipment') handlePageChange('track');
-                      if (link === 'Order Form') handlePageChange('order');
-                      if (link === 'Services') handlePageChange('services');
-                      if (link === 'Pricing') handlePageChange('pricing');
-                      if (link === 'Schedule a Demo') handlePageChange('demo');
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (link === 'Home') handlePageChange('/');
+                      if (link === 'Track Shipment') handlePageChange('/track');
+                      if (link === 'Order Form') handlePageChange('/order');
+                      if (link === 'Services') handlePageChange('/services');
+                      if (link === 'Pricing') handlePageChange('/pricing');
+                      if (link === 'Schedule a Demo') handlePageChange('/demo');
                     }}
                     className={`${theme.text.secondary} hover:text-violet-600 transition-colors flex items-center space-x-2 group`}
                   >
@@ -693,14 +698,14 @@ const TransEdgeFreightApp = () => {
             <ul className="space-y-3">
               {['About Us', 'Contact', 'Careers', 'Blog'].map((link) => (
                 <li key={link}>
-                  <a 
-                    href="#" 
-                    onClick={(e) => { 
-                      e.preventDefault(); 
-                      if (link === 'About Us') handlePageChange('about');
-                      if (link === 'Contact') handlePageChange('contact');
-                      if (link === 'Careers') handlePageChange('careers');
-                      if (link === 'Blog') handlePageChange('blog');
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (link === 'About Us') handlePageChange('/about');
+                      if (link === 'Contact') handlePageChange('/contact');
+                      if (link === 'Careers') handlePageChange('/careers');
+                      if (link === 'Blog') handlePageChange('/blog');
                     }}
                     className={`${theme.text.secondary} hover:text-violet-600 transition-colors flex items-center space-x-2 group`}
                   >
@@ -786,8 +791,8 @@ const TransEdgeFreightApp = () => {
               <div className="flex flex-col sm:flex-row gap-6">
 
                 
-                <button 
-                  onClick={() => handlePageChange('track')}
+                <button
+                  onClick={() => handlePageChange('/track')}
                   className={`group px-8 py-4 ${isDarkMode ? 'bg-white/10' : 'bg-gray-900/10'} backdrop-blur-xl rounded-2xl font-semibold text-lg hover:bg-white/20 transform hover:scale-105 transition-all duration-300 ${theme.text.primary}`}
                 >
                   <div className="flex items-center justify-center space-x-3">
@@ -1054,14 +1059,13 @@ const TransEdgeFreightApp = () => {
                       <button
                         className="font-medium flex items-center gap-2 focus:outline-none"
                         onClick={() => {
-                          setCurrentPage(
-                            index === 0 ? 'ftl-details' :
-                            index === 1 ? 'ltl-details' :
-                            index === 2 ? 'refrigerated-details' :
-                            index === 3 ? 'oversized-details' :
-                            'expedited-details'
+                          handlePageChange(
+                            index === 0 ? '/ftl-details' :
+                            index === 1 ? '/ltl-details' :
+                            index === 2 ? '/refrigerated-details' :
+                            index === 3 ? '/oversized-details' :
+                            '/expedited-details'
                           );
-                          window.scrollTo(0, 0);
                         }}
                       >
                         Learn more <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform" />
@@ -1701,7 +1705,7 @@ const TransEdgeFreightApp = () => {
       setIsAuthenticated(true);
       setUserType(type);
       setShowLoginModal(false);
-      handlePageChange('dashboard');
+      handlePageChange('/dashboard');
     };
 
     return (
@@ -2245,13 +2249,15 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
           <div className="grid lg:grid-cols-2 gap-12 mb-20">
             <div className={`${theme.bg.card} rounded-3xl p-8 border ${theme.border.card}`}>
               <h2 className={`text-3xl font-bold ${theme.text.primary} mb-8`}>Send Us a Message</h2>
-              
-              <div className="space-y-6">
+
+              <form autoComplete="off" onSubmit={(e) => e.preventDefault()} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
                     <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>Full Name</label>
                     <input
                       type="text"
+                      name="name"
+                      autoComplete="off"
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
@@ -2262,6 +2268,8 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
                     <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>Email</label>
                     <input
                       type="email"
+                      name="email"
+                      autoComplete="off"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
@@ -2274,6 +2282,8 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
                   <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>Company</label>
                   <input
                     type="text"
+                    name="company"
+                    autoComplete="off"
                     value={formData.company}
                     onChange={(e) => setFormData({...formData, company: e.target.value})}
                     className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
@@ -2284,6 +2294,8 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
                 <div>
                   <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>Subject</label>
                   <select
+                    name="subject"
+                    autoComplete="off"
                     value={formData.subject}
                     onChange={(e) => setFormData({...formData, subject: e.target.value})}
                     className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
@@ -2299,6 +2311,8 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
                 <div>
                   <label className={`block text-sm font-medium ${theme.text.primary} mb-2`}>Message</label>
                   <textarea
+                    name="message"
+                    autoComplete="off"
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     rows={5}
@@ -2307,11 +2321,11 @@ const ContactPage = ({ theme }: ThemedPageProps) => {
                   />
                 </div>
 
-                <button className="w-full px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
+                <button type="submit" className="w-full px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-3">
                   <span>Send Message</span>
                   <Send className="w-5 h-5" />
                 </button>
-              </div>
+              </form>
             </div>
 
             {/* Map */}
@@ -3285,36 +3299,42 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
   );
 };
 
-
   // The main application component that renders based on currentPage state
-  // Note: The <style jsx> block from the original code is not directly supported 
-  // in Vite/Next.js TSX files without special configuration. 
-  // Global styles or CSS Modules are preferred. For this example, keyframes 
+  // Note: The <style jsx> block from the original code is not directly supported
+  // in Vite/Next.js TSX files without special configuration.
+  // Global styles or CSS Modules are preferred. For this example, keyframes
   // would ideally be moved to a global CSS file (e.g., index.css).
   return (
     <div className={theme.bg.primary}>
       {/* Global styles like keyframes should be in a CSS file imported in main.tsx or index.html */}
       <Header />
-      
-      {currentPage === 'home' && <HomePage />}
-      {currentPage === 'track' && <TrackShipmentPageComponent theme={theme} isDarkMode={isDarkMode} />}
-      {currentPage === 'services' && <ServicesPage />}
-      {currentPage === 'order' && <OrderPlacementPage theme={theme} orderStepRef={orderStepRef} orderDataRef={orderDataRef} onOrder={() => setCurrentPage('order')} />}
-      {currentPage === 'dashboard' && isAuthenticated && userType === 'user' && <UserDashboard />}
-      {currentPage === 'dashboard' && isAuthenticated && userType === 'admin' && <AdminDashboard />}
-      {currentPage === 'ftl-details' && <FtlDetailsPage onOrder={() => setCurrentPage('order')} theme={theme} />}
-      {currentPage === 'ltl-details' && <LtlDetailsPage onOrder={() => setCurrentPage('order')} theme={theme} />}
-      {currentPage === 'refrigerated-details' && <RefrigeratedDetailsPage onOrder={() => setCurrentPage('order')} theme={theme} />}
-      {currentPage === 'oversized-details' && <OversizedDetailsPage onOrder={() => setCurrentPage('order')} theme={theme} />}
-      {currentPage === 'expedited-details' && <ExpeditedDetailsPage onOrder={() => setCurrentPage('order')} theme={theme} />}
-      {currentPage === 'pricing' && <PricingPage theme={theme} />}
-      {currentPage === 'contact' && <ContactPage theme={theme} />}
-      {currentPage === 'demo' && <ScheduleDemoPage theme={theme} />}
-      {currentPage === 'about' && <AboutUsPage theme={theme} />}
-      {currentPage === 'careers' && <CareersPage theme={theme} />}
-      {currentPage === 'blog' && <BlogPage theme={theme} />}
-    
-      
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/track" element={<TrackShipmentPageComponent theme={theme} isDarkMode={isDarkMode} />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/order" element={<OrderPlacementPage theme={theme} orderStepRef={orderStepRef} orderDataRef={orderDataRef} onOrder={() => navigate('/order')} />} />
+        <Route path="/dashboard" element={
+          isAuthenticated ? (
+            userType === 'user' ? <UserDashboard /> : <AdminDashboard />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } />
+        <Route path="/ftl-details" element={<FtlDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
+        <Route path="/ltl-details" element={<LtlDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
+        <Route path="/refrigerated-details" element={<RefrigeratedDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
+        <Route path="/oversized-details" element={<OversizedDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
+        <Route path="/expedited-details" element={<ExpeditedDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
+        <Route path="/pricing" element={<PricingPage theme={theme} />} />
+        <Route path="/contact" element={<ContactPage theme={theme} />} />
+        <Route path="/demo" element={<ScheduleDemoPage theme={theme} />} />
+        <Route path="/about" element={<AboutUsPage theme={theme} />} />
+        <Route path="/careers" element={<CareersPage theme={theme} />} />
+        <Route path="/blog" element={<BlogPage theme={theme} />} />
+      </Routes>
+
+
       {showLoginModal && <LoginModal />}
 
       <Footer />
