@@ -1158,8 +1158,8 @@ const TransEdgeFreightApp = () => {
       };
 
       const calculatePrice = () => {
-        const weightStr = (orderData.current.weight as any) ?? '0';
-        const weight = parseFloat(weightStr as string);
+        const weightStr = String(orderData.current.weight || '0');
+        const weight = parseFloat(weightStr);
         const safeWeight = Number.isFinite(weight) ? weight : 0;
 
         const serviceMultiplier: { [k: string]: number } = {

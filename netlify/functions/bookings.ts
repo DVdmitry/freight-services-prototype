@@ -196,7 +196,8 @@ async function handleGetOne(bookingId: string) {
   return jsonResponse(rowToDetails(data as BookingRow));
 }
 
-export default async (request: Request, context: Context) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export default async (request: Request, _context: Context) => {
   // Handle CORS preflight
   if (request.method === 'OPTIONS') {
     return new Response(null, { status: 204, headers: corsHeaders });
