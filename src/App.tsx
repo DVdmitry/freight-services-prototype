@@ -1,4 +1,3 @@
-import type {} from './web-components.d.ts';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { Package, Truck, DollarSign, Menu, X, Heart, Building, MapPin, Star, BookOpen, MessageSquare, Coffee, Rocket, Code, Palette, Brain, Shield, Clock, HeadphonesIcon, Search, User, Phone, Mail, Facebook, Linkedin, Twitter, ArrowRight, Thermometer, Box, Zap, Navigation as NavigationIcon, CheckCircle, AlertCircle, Bell, Copy, Sun, Moon, Sparkles, Activity, Globe2, Cpu, Layers, Calendar, LogOut, BarChart3, TrendingUp, Users, Award, Briefcase, Send } from 'lucide-react';
@@ -347,6 +346,7 @@ const TransEdgeFreightApp = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [userType, setUserType] = useState<string>(''); // 'user' or 'admin'
   const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [showBookingNotification, setShowBookingNotification] = useState<boolean>(false);
 
   const orderStepRef = useRef<number>(1);
   const orderDataRef = useRef<OrderData>({
@@ -447,10 +447,8 @@ const TransEdgeFreightApp = () => {
     }, []);
 
     return (
-    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-      scrolled
-        ? `${theme.bg.card} backdrop-blur-xl shadow-2xl ${isDarkMode ? 'shadow-purple-500/10' : 'shadow-gray-200'}`
-        : 'bg-transparent'
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${theme.bg.primary} ${
+      scrolled ? `shadow-2xl ${isDarkMode ? 'shadow-purple-500/10' : 'shadow-gray-200'}` : ''
     }`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
@@ -556,8 +554,8 @@ const TransEdgeFreightApp = () => {
                 onClick={() => setShowLoginModal(true)}
                 className="hidden md:flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300 relative z-10"
               >
-                <User className="w-4 h-4" />
-                <span className="font-medium">Log in / Sign up</span>
+                <BarChart3 className="w-4 h-4" />
+                <span className="font-medium">Dashboard</span>
               </button>
             )}
 
@@ -629,11 +627,12 @@ const TransEdgeFreightApp = () => {
                   </button>
               </>
             ) : (
-              <button 
+              <button
                 onClick={() => setShowLoginModal(true)}
-                className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:shadow-violet-500/50 transition-all"
+                className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl hover:shadow-lg hover:shadow-violet-500/50 transition-all flex items-center justify-center space-x-2"
               >
-                Log in / Sign up
+                <BarChart3 className="w-4 h-4" />
+                <span>Dashboard</span>
               </button>
             )}
           </nav>
@@ -1698,9 +1697,6 @@ const TransEdgeFreightApp = () => {
     };
 
   const LoginModal = () => {
-    const [loginData, setLoginData] = useState<LoginData>({ email: '', password: '' });
-    const [isSignUp, setIsSignUp] = useState<boolean>(false);
-
     const handleLogin = (type: string) => {
       setIsAuthenticated(true);
       setUserType(type);
@@ -1711,7 +1707,7 @@ const TransEdgeFreightApp = () => {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowLoginModal(false)}></div>
-        
+
         <div className={`relative ${theme.bg.card} rounded-3xl p-8 max-w-md w-full border ${theme.border.card} transform transition-all`}>
           <button
             onClick={() => setShowLoginModal(false)}
@@ -1720,63 +1716,97 @@ const TransEdgeFreightApp = () => {
             <X className="w-5 h-5" />
           </button>
 
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-violet-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Truck className="w-10 h-10 text-white" />
             </div>
             <h2 className={`text-2xl font-bold ${theme.text.primary}`}>
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              Demo Access
             </h2>
             <p className={theme.text.secondary}>
-              {isSignUp ? 'Join TransEdge for smart shipping' : 'Log in to your account'}
+              Click below to enter the dashboard
             </p>
           </div>
 
-          <div className="space-y-4">
-            <input
-              type="email"
-              placeholder="Email address"
-              value={loginData.email}
-              onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-              className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              value={loginData.password}
-              onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-              className={`w-full px-4 py-3 ${theme.bg.input} rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 ${theme.text.primary}`}
-            />
-            
-            <div className="pt-4 space-y-3">
-              <button
-                onClick={() => handleLogin('user')}
-                className="w-full px-6 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
-              >
-                Continue as User
-              </button>
-              <button
-                onClick={() => handleLogin('admin')}
-                className="w-full px-6 py-3 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-orange-500/50 transform hover:scale-105 transition-all duration-300"
-              >
-                Continue as Admin
-              </button>
-            </div>
-
-            <div className={`text-center pt-4 text-sm ${theme.text.secondary}`}>
-              {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-              <button
-                onClick={() => setIsSignUp(!isSignUp)}
-                className="ml-2 text-violet-600 font-semibold hover:text-violet-700"
-              >
-                {isSignUp ? 'Log in' : 'Sign up'}
-              </button>
-            </div>
+          {/* Demo notice */}
+          <div className="mb-6 p-4 bg-violet-500/10 border border-violet-500/20 rounded-xl">
+            <p className="text-sm text-violet-400 text-center">
+              This is a demo site. No real login required — just click to explore the dashboard and see your bookings.
+            </p>
           </div>
+
+          <div className="space-y-3">
+            <button
+              onClick={() => handleLogin('admin')}
+              className="w-full px-6 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-violet-500/50 transform hover:scale-105 transition-all duration-300"
+            >
+              Enter Dashboard
+            </button>
+          </div>
+
+          <p className={`text-center mt-4 text-xs ${theme.text.secondary}`}>
+            View all bookings created via voice assistant
+          </p>
         </div>
     </div>
   );
 };
+
+  // Notification component for booking confirmation
+  const BookingNotification = () => {
+    if (!showBookingNotification) return null;
+
+    return (
+      <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-4">
+        <div className={`${theme.bg.card} rounded-2xl p-6 border ${theme.border.card} shadow-2xl max-w-sm`}>
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="flex-1">
+              <h4 className={`font-semibold ${theme.text.primary} mb-1`}>Booking Created!</h4>
+              <p className={`text-sm ${theme.text.secondary} mb-3`}>
+                Your freight booking has been confirmed.
+              </p>
+              <button
+                onClick={() => {
+                  setShowBookingNotification(false);
+                  setShowLoginModal(true);
+                }}
+                className="text-sm font-medium text-violet-500 hover:text-violet-400 flex items-center gap-1"
+              >
+                View in Dashboard
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+            <button
+              onClick={() => setShowBookingNotification(false)}
+              className={`p-1 rounded-lg ${theme.bg.hover}`}
+            >
+              <X className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Listen for booking events from widget
+  useEffect(() => {
+    const handleBookingCreated = () => {
+      setShowBookingNotification(true);
+      // Auto-hide after 10 seconds
+      setTimeout(() => setShowBookingNotification(false), 10000);
+    };
+
+    window.addEventListener('booking-created', handleBookingCreated);
+    // Also expose function globally for widget integration
+    (window as unknown as { showBookingNotification: () => void }).showBookingNotification = handleBookingCreated;
+
+    return () => {
+      window.removeEventListener('booking-created', handleBookingCreated);
+    };
+  }, []);
 
     const UserDashboard = () => {
       const stats = [
@@ -1825,18 +1855,68 @@ const TransEdgeFreightApp = () => {
   };
 
     const AdminDashboard = () => {
+      interface Booking {
+        bookingId: string;
+        cargoType?: string;
+        pickupAddress: string;
+        deliveryAddress: string;
+        pickupDate: string;
+        status: string;
+        createdAt: string;
+      }
+
+      const [bookings, setBookings] = useState<Booking[]>([]);
+      const [loading, setLoading] = useState(true);
+      const [error, setError] = useState<string | null>(null);
+
+      useEffect(() => {
+        const fetchBookings = async () => {
+          try {
+            const response = await fetch('/api/bookings');
+            if (!response.ok) throw new Error('Failed to fetch bookings');
+            const data = await response.json();
+            setBookings(data.bookings || []);
+          } catch (err) {
+            setError(err instanceof Error ? err.message : 'Error loading bookings');
+          } finally {
+            setLoading(false);
+          }
+        };
+        fetchBookings();
+      }, []);
+
       const adminStats = [
-        { icon: <Package className="w-6 h-6" />, value: '142', label: 'Active Vehicles', color: 'from-violet-600 to-indigo-600' },
-        { icon: <TrendingUp className="w-6 h-6" />, value: '1,284', label: 'Total Customers', color: 'from-emerald-600 to-teal-600' },
-        { icon: <DollarSign className="w-6 h-6" />, value: '$2.4M', label: 'Monthly Revenue', color: 'from-orange-600 to-red-600' },
-        { icon: <BarChart3 className="w-6 h-6" />, value: '+23%', label: 'Growth Rate', color: 'from-yellow-600 to-orange-600' }
+        { icon: <Package className="w-6 h-6" />, value: String(bookings.length), label: 'Total Bookings', color: 'from-violet-600 to-indigo-600' },
+        { icon: <TrendingUp className="w-6 h-6" />, value: String(bookings.filter(b => b.status === 'confirmed').length), label: 'Confirmed', color: 'from-emerald-600 to-teal-600' },
+        { icon: <Clock className="w-6 h-6" />, value: String(bookings.filter(b => b.status === 'pending').length), label: 'Pending', color: 'from-orange-600 to-red-600' },
+        { icon: <CheckCircle className="w-6 h-6" />, value: String(bookings.filter(b => b.status === 'delivered').length), label: 'Delivered', color: 'from-yellow-600 to-orange-600' }
       ];
+
+      const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      };
+
+      const formatDateTime = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+      };
 
   return (
         <div className={`pt-32 min-h-screen ${theme.bg.primary}`}>
           <div className="container mx-auto px-4 py-8">
-            <div className="relative mb-12 rounded-3xl overflow-hidden h-80">
-              <img 
+            {/* Header */}
+            <div className="relative mb-12 rounded-3xl overflow-hidden h-64">
+              <img
                 src="https://images.unsplash.com/photo-1577084381320-b40e8b5d4b3f?w=1920&h=400&fit=crop"
                 alt="Admin dashboard"
                 className="absolute inset-0 w-full h-full object-cover"
@@ -1845,25 +1925,112 @@ const TransEdgeFreightApp = () => {
               <div className="relative z-10 p-8 h-full flex items-center justify-between">
                 <div>
                   <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                    Admin Dashboard
+                    Bookings Dashboard
                   </h1>
                   <p className="text-xl text-gray-200">
-                    Manage your entire fleet and operations
+                    View all freight bookings from voice assistant
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Stats */}
             <div className="grid md:grid-cols-4 gap-6 mb-12">
               {adminStats.map((stat, index) => (
                 <div key={index} className={`${theme.bg.card} rounded-2xl p-6 border ${theme.border.card} hover:scale-105 transition-transform`}>
-                  <div className={`h-2 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-4 text-white`}>
+                  <div className={`h-12 w-12 bg-gradient-to-r ${stat.color} rounded-xl flex items-center justify-center mb-4 text-white`}>
                     {stat.icon}
                   </div>
                   <p className={`text-3xl font-bold ${theme.text.primary} mb-1`}>{stat.value}</p>
                   <p className={theme.text.secondary}>{stat.label}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Bookings Table */}
+            <div className={`${theme.bg.card} rounded-2xl border ${theme.border.card} overflow-hidden`}>
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className={`text-2xl font-bold ${theme.text.primary}`}>Recent Bookings</h2>
+                <p className={theme.text.secondary}>Bookings created via AI voice assistant</p>
+              </div>
+
+              {loading ? (
+                <div className="p-12 text-center">
+                  <div className="animate-spin w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className={theme.text.secondary}>Loading bookings...</p>
+                </div>
+              ) : error ? (
+                <div className="p-12 text-center">
+                  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                  <p className="text-red-500">{error}</p>
+                </div>
+              ) : bookings.length === 0 ? (
+                <div className="p-12 text-center">
+                  <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className={`text-xl font-semibold ${theme.text.primary} mb-2`}>No bookings yet</h3>
+                  <p className={theme.text.secondary}>Bookings created via voice assistant will appear here</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Booking ID</th>
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Route</th>
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Pickup Date</th>
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Cargo</th>
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Status</th>
+                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Created</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {bookings.map((booking) => (
+                        <tr key={booking.bookingId} className="hover:bg-violet-500/5 transition-colors">
+                          <td className="px-6 py-4">
+                            <span className="font-mono text-sm px-2 py-1 rounded bg-violet-500/10 text-violet-500">
+                              {booking.bookingId}
+                            </span>
+                          </td>
+                          <td className={`px-6 py-4 ${theme.text.primary}`}>
+                            <div className="flex items-center gap-2">
+                              <span className="truncate max-w-[120px]">{booking.pickupAddress}</span>
+                              <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                              <span className="truncate max-w-[120px]">{booking.deliveryAddress}</span>
+                            </div>
+                          </td>
+                          <td className={`px-6 py-4 ${theme.text.primary}`}>
+                            {formatDate(booking.pickupDate)}
+                          </td>
+                          <td className={`px-6 py-4 ${theme.text.secondary}`}>
+                            {booking.cargoType || '—'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
+                              booking.status === 'confirmed'
+                                ? 'bg-green-500/10 text-green-500'
+                                : booking.status === 'pending'
+                                ? 'bg-yellow-500/10 text-yellow-500'
+                                : 'bg-blue-500/10 text-blue-500'
+                            }`}>
+                              {booking.status}
+                            </span>
+                          </td>
+                          <td className={`px-6 py-4 text-sm ${theme.text.secondary}`}>
+                            {formatDateTime(booking.createdAt)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Demo hint */}
+            <div className="mt-8 p-4 bg-violet-500/10 border border-violet-500/20 rounded-xl text-center">
+              <p className="text-sm text-violet-400">
+                This dashboard shows real bookings from the database. Create a new booking using the voice assistant to see it appear here.
+              </p>
             </div>
           </div>
         </div>
@@ -3336,11 +3503,9 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
 
 
       {showLoginModal && <LoginModal />}
+      <BookingNotification />
 
       <Footer />
-
-      {/* AI Form Copilot виджет - доступен на всех страницах */}
-      <ai-form-copilot></ai-form-copilot>
     </div>
   );
 
