@@ -30,11 +30,6 @@ interface OrderData {
   onOrder?: () => void; // Используется страницами деталей услуг
 }
 
-interface LoginData {
-  email: string;
-  password: string;
-}
-
 // Убедимся, что ThemeType определен здесь ОДИН РАЗ
 interface ThemeColors {
   primary: string;
