@@ -80,9 +80,16 @@ function rowToListItem(row: BookingRow) {
   return {
     bookingId: row.booking_id,
     cargoType: row.cargo_type,
+    weight: row.weight,
+    dimensions: row.dimensions,
     pickupAddress: row.pickup_address,
     deliveryAddress: row.delivery_address,
     pickupDate: row.pickup_date,
+    deliveryDate: row.delivery_date,
+    contactName: row.contact_name,
+    contactPhone: row.contact_phone,
+    contactEmail: row.contact_email,
+    specialInstructions: row.special_instructions,
     status: row.status,
     createdAt: row.created_at,
   };

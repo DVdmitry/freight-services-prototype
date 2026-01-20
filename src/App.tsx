@@ -1786,19 +1786,27 @@ const TransEdgeFreightApp = () => {
     );
   };
 
-  // Listen for booking events from widget
   useEffect(() => {
     const handleBookingCreated = () => {
       setShowBookingNotification(true);
-      // Auto-hide after 10 seconds
       setTimeout(() => setShowBookingNotification(false), 10000);
     };
 
+    const widget = document.querySelector('typelessity-widget');
+    const handleTypelessityBooking = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      console.log('Booking completed via Typelessity:', customEvent.detail);
+      handleBookingCreated();
+    };
+
+    widget?.addEventListener('booking-complete', handleTypelessityBooking);
+
+    // Legacy support for old booking-created event
     window.addEventListener('booking-created', handleBookingCreated);
-    // Also expose function globally for widget integration
     (window as unknown as { showBookingNotification: () => void }).showBookingNotification = handleBookingCreated;
 
     return () => {
+      widget?.removeEventListener('booking-complete', handleTypelessityBooking);
       window.removeEventListener('booking-created', handleBookingCreated);
     };
   }, []);
@@ -1853,9 +1861,16 @@ const TransEdgeFreightApp = () => {
       interface Booking {
         bookingId: string;
         cargoType?: string;
+        weight?: string;
+        dimensions?: string;
         pickupAddress: string;
         deliveryAddress: string;
         pickupDate: string;
+        deliveryDate?: string;
+        contactName?: string;
+        contactPhone?: string;
+        contactEmail?: string;
+        specialInstructions?: string;
         status: string;
         createdAt: string;
       }
@@ -1967,39 +1982,60 @@ const TransEdgeFreightApp = () => {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-[1400px]">
                     <thead>
                       <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Booking ID</th>
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Route</th>
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Pickup Date</th>
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Cargo</th>
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Status</th>
-                        <th className={`px-6 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Created</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>ID</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Route</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Dates</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Cargo</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Contact</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Notes</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Status</th>
+                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Created</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                       {bookings.map((booking) => (
                         <tr key={booking.bookingId} className="hover:bg-violet-500/5 transition-colors">
-                          <td className="px-6 py-4">
-                            <span className="font-mono text-sm px-2 py-1 rounded bg-violet-500/10 text-violet-500">
+                          <td className="px-4 py-4">
+                            <span className="font-mono text-xs px-2 py-1 rounded bg-violet-500/10 text-violet-500">
                               {booking.bookingId}
                             </span>
                           </td>
-                          <td className={`px-6 py-4 ${theme.text.primary}`}>
-                            <div className="flex items-center gap-2">
-                              <span className="truncate max-w-[120px]">{booking.pickupAddress}</span>
-                              <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                              <span className="truncate max-w-[120px]">{booking.deliveryAddress}</span>
+                          <td className={`px-4 py-4 ${theme.text.primary}`}>
+                            <div className="flex items-center gap-1 text-sm">
+                              <span className="truncate max-w-[100px]">{booking.pickupAddress}</span>
+                              <ArrowRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                              <span className="truncate max-w-[100px]">{booking.deliveryAddress}</span>
                             </div>
                           </td>
-                          <td className={`px-6 py-4 ${theme.text.primary}`}>
-                            {formatDate(booking.pickupDate)}
+                          <td className={`px-4 py-4 text-sm ${theme.text.primary}`}>
+                            <div className="flex flex-col gap-1">
+                              <span>Pickup: {formatDate(booking.pickupDate)}</span>
+                              {booking.deliveryDate && <span className={theme.text.secondary}>Delivery: {formatDate(booking.deliveryDate)}</span>}
+                            </div>
                           </td>
-                          <td className={`px-6 py-4 ${theme.text.secondary}`}>
-                            {booking.cargoType || '—'}
+                          <td className={`px-4 py-4 text-sm ${theme.text.secondary}`}>
+                            <div className="flex flex-col gap-1">
+                              <span>{booking.cargoType || '—'}</span>
+                              {booking.weight && <span className="text-xs">{booking.weight}</span>}
+                              {booking.dimensions && <span className="text-xs">{booking.dimensions}</span>}
+                            </div>
                           </td>
-                          <td className="px-6 py-4">
+                          <td className={`px-4 py-4 text-sm ${theme.text.primary}`}>
+                            <div className="flex flex-col gap-1">
+                              {booking.contactName && <span className="font-medium">{booking.contactName}</span>}
+                              {booking.contactPhone && <span className={`text-xs ${theme.text.secondary}`}>{booking.contactPhone}</span>}
+                              {booking.contactEmail && <span className={`text-xs ${theme.text.secondary} truncate max-w-[150px]`}>{booking.contactEmail}</span>}
+                            </div>
+                          </td>
+                          <td className={`px-4 py-4 text-sm ${theme.text.secondary}`}>
+                            <span className="truncate max-w-[150px] block" title={booking.specialInstructions}>
+                              {booking.specialInstructions || '—'}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
                             <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                               booking.status === 'confirmed'
                                 ? 'bg-green-500/10 text-green-500'
@@ -2010,7 +2046,7 @@ const TransEdgeFreightApp = () => {
                               {booking.status}
                             </span>
                           </td>
-                          <td className={`px-6 py-4 text-sm ${theme.text.secondary}`}>
+                          <td className={`px-4 py-4 text-xs ${theme.text.secondary}`}>
                             {formatDateTime(booking.createdAt)}
                           </td>
                         </tr>
@@ -3499,6 +3535,23 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
 
       {showLoginModal && <LoginModal />}
       <BookingNotification />
+
+      {/* Typelessity AI Booking Widget */}
+      {/* Production: */}
+      {/* @ts-expect-error - Web Component not recognized by React types */}
+      {/* <typelessity-widget
+        config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
+        api-url="https://typelessity.vercel.app"
+        position="bottom-right"
+      /> */}
+
+      {/* Development: Local API */}
+      {/* @ts-expect-error - Web Component not recognized by React types */}
+      <typelessity-widget
+        config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
+        api-url="http://localhost:3000"
+        position="bottom-right"
+      />
 
       <Footer />
     </div>
