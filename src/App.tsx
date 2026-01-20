@@ -1786,27 +1786,19 @@ const TransEdgeFreightApp = () => {
     );
   };
 
+  // Listen for booking events from widget
   useEffect(() => {
     const handleBookingCreated = () => {
       setShowBookingNotification(true);
+      // Auto-hide after 10 seconds
       setTimeout(() => setShowBookingNotification(false), 10000);
     };
 
-    const widget = document.querySelector('typelessity-widget');
-    const handleTypelessityBooking = (e: Event) => {
-      const customEvent = e as CustomEvent;
-      console.log('Booking completed via Typelessity:', customEvent.detail);
-      handleBookingCreated();
-    };
-
-    widget?.addEventListener('booking-complete', handleTypelessityBooking);
-
-    // Legacy support for old booking-created event
     window.addEventListener('booking-created', handleBookingCreated);
+    // Also expose function globally for widget integration
     (window as unknown as { showBookingNotification: () => void }).showBookingNotification = handleBookingCreated;
 
     return () => {
-      widget?.removeEventListener('booking-complete', handleTypelessityBooking);
       window.removeEventListener('booking-created', handleBookingCreated);
     };
   }, []);
@@ -3507,23 +3499,6 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
 
       {showLoginModal && <LoginModal />}
       <BookingNotification />
-
-      {/* Typelessity AI Booking Widget */}
-      {/* Production: */}
-      {/* @ts-expect-error - Web Component not recognized by React types */}
-      {/* <typelessity-widget
-        config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
-        api-url="https://typelessity.vercel.app"
-        position="bottom-right"
-      /> */}
-
-      {/* Development: Local API */}
-      {/* @ts-expect-error - Web Component not recognized by React types */}
-      <typelessity-widget
-        config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
-        api-url="http://localhost:3000"
-        position="bottom-right"
-      />
 
       <Footer />
     </div>
