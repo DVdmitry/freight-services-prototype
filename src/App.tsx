@@ -1921,6 +1921,160 @@ const TransEdgeFreightApp = () => {
         });
       };
 
+      // Accordion Item Component
+      const BookingAccordionItem = ({ booking, theme, formatDate, formatDateTime }: {
+        booking: Booking;
+        theme: ThemeType;
+        formatDate: (d: string) => string;
+        formatDateTime: (d: string) => string;
+      }) => {
+        const [isOpen, setIsOpen] = useState(false);
+
+        return (
+          <div className="group">
+            {/* Accordion Header */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="w-full px-5 py-4 flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-6 min-w-0 flex-1">
+                {/* ID */}
+                <code className={`text-xs ${theme.text.secondary} font-mono shrink-0`}>{booking.bookingId}</code>
+
+                {/* Route */}
+                <div className={`flex items-center gap-2 min-w-0 ${theme.text.primary}`}>
+                  <span className="truncate max-w-[140px]" title={booking.pickupAddress}>{booking.pickupAddress}</span>
+                  <ArrowRight className={`w-3.5 h-3.5 ${theme.text.secondary} shrink-0`} />
+                  <span className="truncate max-w-[140px]" title={booking.deliveryAddress}>{booking.deliveryAddress}</span>
+                </div>
+
+                {/* Date */}
+                <span className={`text-sm ${theme.text.secondary} tabular-nums shrink-0`}>{formatDate(booking.pickupDate)}</span>
+
+                {/* Status */}
+                <span className={`text-xs px-2 py-0.5 rounded font-medium shrink-0 ${
+                  booking.status === 'confirmed'
+                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400'
+                    : booking.status === 'pending'
+                    ? 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400'
+                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                }`}>
+                  {booking.status}
+                </span>
+              </div>
+
+              {/* Chevron */}
+              <svg
+                className={`w-5 h-5 ${theme.text.secondary} transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Accordion Content */}
+            {isOpen && (
+              <div className="px-5 pb-5 pt-2">
+                <div className="grid grid-cols-3 gap-6">
+                  {/* Pickup Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Pickup</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Address</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.pickupAddress}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Date</span>
+                        <p className={`text-sm ${theme.text.primary} tabular-nums`}>{formatDate(booking.pickupDate)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Delivery Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Delivery</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Address</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.deliveryAddress}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Date</span>
+                        <p className={`text-sm ${theme.text.primary} tabular-nums`}>{booking.deliveryDate ? formatDate(booking.deliveryDate) : '—'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cargo Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Cargo</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Type</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.cargoType || '—'}</p>
+                      </div>
+                      <div className="flex gap-6">
+                        <div>
+                          <span className={`text-xs ${theme.text.secondary}`}>Weight</span>
+                          <p className={`text-sm ${theme.text.primary}`}>{booking.weight || '—'}</p>
+                        </div>
+                        <div>
+                          <span className={`text-xs ${theme.text.secondary}`}>Dimensions</span>
+                          <p className={`text-sm ${theme.text.primary}`}>{booking.dimensions || '—'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Contact</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Name</span>
+                        <p className={`text-sm ${theme.text.primary} font-medium`}>{booking.contactName || '—'}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Phone</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.contactPhone || '—'}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Email</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.contactEmail || '—'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Notes Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Notes</h4>
+                    <p className={`text-sm ${theme.text.primary}`}>{booking.specialInstructions || '—'}</p>
+                  </div>
+
+                  {/* Meta Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Meta</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Status</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.status}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Created</span>
+                        <p className={`text-sm ${theme.text.primary} tabular-nums`}>{formatDateTime(booking.createdAt)}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      };
+
   return (
         <div className={`pt-32 min-h-screen ${theme.bg.primary}`}>
           <div className="container mx-auto px-4 py-8">
@@ -1957,102 +2111,33 @@ const TransEdgeFreightApp = () => {
               ))}
             </div>
 
-            {/* Bookings Table */}
+            {/* Bookings Accordion - Modern Design 2026 */}
             <div className={`${theme.bg.card} rounded-2xl border ${theme.border.card} overflow-hidden`}>
-              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h2 className={`text-2xl font-bold ${theme.text.primary}`}>Recent Bookings</h2>
-                <p className={theme.text.secondary}>Bookings created via AI voice assistant</p>
+              <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <h2 className={`text-lg font-semibold ${theme.text.primary}`}>Bookings</h2>
+                  <span className={`text-xs ${theme.text.secondary} tabular-nums`}>{bookings.length} total</span>
+                </div>
               </div>
 
               {loading ? (
-                <div className="p-12 text-center">
-                  <div className="animate-spin w-8 h-8 border-4 border-violet-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-                  <p className={theme.text.secondary}>Loading bookings...</p>
+                <div className="p-16 text-center">
+                  <div className="animate-spin w-6 h-6 border-2 border-gray-300 border-t-gray-600 rounded-full mx-auto mb-3"></div>
+                  <p className={`text-sm ${theme.text.secondary}`}>Loading...</p>
                 </div>
               ) : error ? (
-                <div className="p-12 text-center">
-                  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                  <p className="text-red-500">{error}</p>
+                <div className="p-16 text-center">
+                  <p className="text-sm text-red-500">{error}</p>
                 </div>
               ) : bookings.length === 0 ? (
-                <div className="p-12 text-center">
-                  <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className={`text-xl font-semibold ${theme.text.primary} mb-2`}>No bookings yet</h3>
-                  <p className={theme.text.secondary}>Bookings created via voice assistant will appear here</p>
+                <div className="p-16 text-center">
+                  <p className={`text-sm ${theme.text.secondary}`}>No bookings yet</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1400px]">
-                    <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>ID</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Route</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Dates</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Cargo</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Contact</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Notes</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Status</th>
-                        <th className={`px-4 py-4 text-left text-xs font-semibold ${theme.text.secondary} uppercase tracking-wider`}>Created</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                      {bookings.map((booking) => (
-                        <tr key={booking.bookingId} className="hover:bg-violet-500/5 transition-colors">
-                          <td className="px-4 py-4">
-                            <span className="font-mono text-xs px-2 py-1 rounded bg-violet-500/10 text-violet-500">
-                              {booking.bookingId}
-                            </span>
-                          </td>
-                          <td className={`px-4 py-4 ${theme.text.primary}`}>
-                            <div className="flex items-center gap-1 text-sm">
-                              <span className="truncate max-w-[100px]">{booking.pickupAddress}</span>
-                              <ArrowRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
-                              <span className="truncate max-w-[100px]">{booking.deliveryAddress}</span>
-                            </div>
-                          </td>
-                          <td className={`px-4 py-4 text-sm ${theme.text.primary}`}>
-                            <div className="flex flex-col gap-1">
-                              <span>Pickup: {formatDate(booking.pickupDate)}</span>
-                              {booking.deliveryDate && <span className={theme.text.secondary}>Delivery: {formatDate(booking.deliveryDate)}</span>}
-                            </div>
-                          </td>
-                          <td className={`px-4 py-4 text-sm ${theme.text.secondary}`}>
-                            <div className="flex flex-col gap-1">
-                              <span>{booking.cargoType || '—'}</span>
-                              {booking.weight && <span className="text-xs">{booking.weight}</span>}
-                              {booking.dimensions && <span className="text-xs">{booking.dimensions}</span>}
-                            </div>
-                          </td>
-                          <td className={`px-4 py-4 text-sm ${theme.text.primary}`}>
-                            <div className="flex flex-col gap-1">
-                              {booking.contactName && <span className="font-medium">{booking.contactName}</span>}
-                              {booking.contactPhone && <span className={`text-xs ${theme.text.secondary}`}>{booking.contactPhone}</span>}
-                              {booking.contactEmail && <span className={`text-xs ${theme.text.secondary} truncate max-w-[150px]`}>{booking.contactEmail}</span>}
-                            </div>
-                          </td>
-                          <td className={`px-4 py-4 text-sm ${theme.text.secondary}`}>
-                            <span className="truncate max-w-[150px] block" title={booking.specialInstructions}>
-                              {booking.specialInstructions || '—'}
-                            </span>
-                          </td>
-                          <td className="px-4 py-4">
-                            <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                              booking.status === 'confirmed'
-                                ? 'bg-green-500/10 text-green-500'
-                                : booking.status === 'pending'
-                                ? 'bg-yellow-500/10 text-yellow-500'
-                                : 'bg-blue-500/10 text-blue-500'
-                            }`}>
-                              {booking.status}
-                            </span>
-                          </td>
-                          <td className={`px-4 py-4 text-xs ${theme.text.secondary}`}>
-                            {formatDateTime(booking.createdAt)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {bookings.map((booking) => (
+                    <BookingAccordionItem key={booking.bookingId} booking={booking} theme={theme} formatDate={formatDate} formatDateTime={formatDateTime} />
+                  ))}
                 </div>
               )}
             </div>
@@ -3540,7 +3625,8 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
       {/* @ts-expect-error - Web Component not recognized by React types */}
       <typelessity-widget
         config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
-        api-url="https://typelessity.vercel.app"
+        /* Local:      api-url="http://localhost:3000" */
+        /* Production: */ api-url="https://typelessity.vercel.app"
         position="bottom-right"
       />
 

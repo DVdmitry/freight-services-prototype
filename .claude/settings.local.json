@@ -12,7 +12,18 @@
       "Bash(git commit:*)",
       "Bash(git push:*)",
       "Bash(npm run build:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "WebFetch(domain:typelessity.vercel.app)",
+      "WebFetch(domain:typelessity-widget.vercel.app)",
+      "WebFetch(domain:cdn.typelessity.com)",
+      "Bash(pnpm --filter @typelessity/widget build:demo:*)",
+      "Bash(pnpm --filter @typelessity/widget build:cdn:*)",
+      "Bash(lsof:*)",
+      "Bash(find:*)",
+      "Bash(kill:*)",
+      "Bash(git revert:*)",
+      "Bash(git stash:*)",
+      "Bash(ps:*)"
     ],
     "deny": [],
     "ask": []
