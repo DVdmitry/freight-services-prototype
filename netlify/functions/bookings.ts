@@ -11,12 +11,22 @@ import {
 
 interface BookingRequest {
   cargoType?: string;
-  weight?: string;
+  weight?: string | number;
   dimensions?: string;
+  // Support separate dimension fields from Typelessity
+  length?: number;
+  width?: number;
+  height?: number;
   pickupAddress: string;
   deliveryAddress: string;
   pickupDate: string;
+  pickupTime?: string;
   deliveryDate?: string;
+  serviceType?: string;
+  insurance?: boolean;
+  packaging?: boolean;
+  loading?: boolean;
+  storage?: boolean;
   contactName?: string;
   contactPhone?: string;
   contactEmail?: string;
@@ -64,7 +74,13 @@ function rowToDetails(row: BookingRow) {
     pickupAddress: row.pickup_address,
     deliveryAddress: row.delivery_address,
     pickupDate: row.pickup_date,
+    pickupTime: row.pickup_time,
     deliveryDate: row.delivery_date,
+    serviceType: row.service_type,
+    insurance: row.insurance,
+    packaging: row.packaging,
+    loading: row.loading,
+    storage: row.storage,
     contactName: row.contact_name,
     contactPhone: row.contact_phone,
     contactEmail: row.contact_email,
@@ -85,7 +101,13 @@ function rowToListItem(row: BookingRow) {
     pickupAddress: row.pickup_address,
     deliveryAddress: row.delivery_address,
     pickupDate: row.pickup_date,
+    pickupTime: row.pickup_time,
     deliveryDate: row.delivery_date,
+    serviceType: row.service_type,
+    insurance: row.insurance,
+    packaging: row.packaging,
+    loading: row.loading,
+    storage: row.storage,
     contactName: row.contact_name,
     contactPhone: row.contact_phone,
     contactEmail: row.contact_email,
@@ -127,7 +149,15 @@ async function handlePost(request: Request) {
 
   const bookingId = generateBookingId();
   const confirmationNumber = generateConfirmationNumber();
-  const cost = estimateCost(body.weight);
+  // Convert weight to string if number
+  const weightStr = body.weight != null ? String(body.weight) : null;
+  const cost = estimateCost(weightStr);
+
+  // Combine separate dimension fields into "LxWxH" format if dimensions not provided
+  let dimensions = body.dimensions || null;
+  if (!dimensions && body.length && body.width && body.height) {
+    dimensions = `${body.length}x${body.width}x${body.height}`;
+  }
 
   const { data, error } = await supabase
     .from('bookings')
@@ -135,12 +165,18 @@ async function handlePost(request: Request) {
       booking_id: bookingId,
       confirmation_number: confirmationNumber,
       cargo_type: body.cargoType || null,
-      weight: body.weight || null,
-      dimensions: body.dimensions || null,
+      weight: weightStr,
+      dimensions,
       pickup_address: body.pickupAddress,
       delivery_address: body.deliveryAddress,
       pickup_date: body.pickupDate,
+      pickup_time: body.pickupTime || null,
       delivery_date: body.deliveryDate || null,
+      service_type: body.serviceType || null,
+      insurance: body.insurance ?? false,
+      packaging: body.packaging ?? false,
+      loading: body.loading ?? false,
+      storage: body.storage ?? false,
       contact_name: body.contactName || null,
       contact_phone: body.contactPhone || null,
       contact_email: body.contactEmail || null,

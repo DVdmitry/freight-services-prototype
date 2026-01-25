@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Package, Truck, DollarSign, Menu, X, Heart, Building, MapPin, Star, BookOpen, MessageSquare, Coffee, Rocket, Code, Palette, Brain, Shield, Clock, HeadphonesIcon, Search, User, Phone, Mail, Facebook, Linkedin, Twitter, ArrowRight, Thermometer, Box, Zap, Navigation as NavigationIcon, CheckCircle, AlertCircle, Bell, Copy, Sun, Moon, Sparkles, Activity, Globe2, Cpu, Layers, Calendar, LogOut, BarChart3, TrendingUp, Users, Award, Briefcase, Send } from 'lucide-react';
 
 // Импорт локальных изображений
@@ -1805,57 +1805,20 @@ const TransEdgeFreightApp = () => {
     window.addEventListener('booking-created', handleBookingCreated);
     (window as unknown as { showBookingNotification: () => void }).showBookingNotification = handleBookingCreated;
 
+    // Handle SPA navigation from Typelessity widget
+    const handleTypelessityNavigate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ url: string }>;
+      e.preventDefault(); // Prevent default location.href navigation
+      navigate(customEvent.detail.url); // Use React Router navigation
+    };
+    window.addEventListener('typelessity:navigate', handleTypelessityNavigate);
+
     return () => {
       widget?.removeEventListener('booking-complete', handleTypelessityBooking);
       window.removeEventListener('booking-created', handleBookingCreated);
+      window.removeEventListener('typelessity:navigate', handleTypelessityNavigate);
     };
   }, []);
-
-    const UserDashboard = () => {
-      const stats = [
-        { icon: <Package className="w-6 h-6" />, value: '24', label: 'Active Shipments', color: 'from-violet-600 to-indigo-600' },
-        { icon: <TrendingUp className="w-6 h-6" />, value: '$12,450', label: 'This Month', color: 'from-emerald-600 to-teal-600' },
-        { icon: <Clock className="w-6 h-6" />, value: '2.5 days', label: 'Avg. Delivery', color: 'from-orange-600 to-red-600' },
-        { icon: <Award className="w-6 h-6" />, value: 'Gold', label: 'Member Status', color: 'from-yellow-600 to-orange-600' }
-      ];
-
-  return (
-        <div className={`pt-32 min-h-screen ${theme.bg.primary}`}>
-          <div className="container mx-auto px-4 py-8">
-            <div className="relative mb-12 rounded-3xl overflow-hidden h-64">
-              <img 
-                src="https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?w=1920&h=400&fit=crop"
-                alt="Dashboard hero"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
-              <div className="relative z-10 p-8 h-full flex items-center">
-                <div>
-                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
-                    Welcome back, John! 👋
-                  </h1>
-                  <p className="text-xl text-gray-200">
-                    Track your shipments and manage your logistics
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-4 gap-6 mb-12">
-              {stats.map((stat, index) => (
-                <div key={index} className={`${theme.bg.card} rounded-2xl p-6 border ${theme.border.card} hover:scale-105 transition-transform`}>
-                  <div className={`w-14 h-14 bg-gradient-to-br ${stat.color} rounded-xl flex items-center justify-center mb-4 text-white`}>
-                    {stat.icon}
-                  </div>
-                  <p className={`text-3xl font-bold ${theme.text.primary} mb-1`}>{stat.value}</p>
-                  <p className={theme.text.secondary}>{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-      </div>
-    );
-  };
 
     const AdminDashboard = () => {
       interface Booking {
@@ -1866,7 +1829,13 @@ const TransEdgeFreightApp = () => {
         pickupAddress: string;
         deliveryAddress: string;
         pickupDate: string;
+        pickupTime?: string;
         deliveryDate?: string;
+        serviceType?: string;
+        insurance?: boolean;
+        packaging?: boolean;
+        loading?: boolean;
+        storage?: boolean;
         contactName?: string;
         contactPhone?: string;
         contactEmail?: string;
@@ -2026,6 +1995,33 @@ const TransEdgeFreightApp = () => {
                           <p className={`text-sm ${theme.text.primary}`}>{booking.dimensions || '—'}</p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Service Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Service</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Service Type</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.serviceType?.toUpperCase() || '—'}</p>
+                      </div>
+                      <div>
+                        <span className={`text-xs ${theme.text.secondary}`}>Pickup Time</span>
+                        <p className={`text-sm ${theme.text.primary}`}>{booking.pickupTime || '—'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Additional Services Section */}
+                  <div className="space-y-3">
+                    <h4 className={`text-xs font-medium ${theme.text.secondary} uppercase tracking-wide`}>Additional Services</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {booking.insurance && <span className="text-xs px-2 py-1 rounded bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-300">Insurance</span>}
+                      {booking.packaging && <span className="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300">Packaging</span>}
+                      {booking.loading && <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300">Loading</span>}
+                      {booking.storage && <span className="text-xs px-2 py-1 rounded bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300">Storage</span>}
+                      {!booking.insurance && !booking.packaging && !booking.loading && !booking.storage && <span className={`text-sm ${theme.text.muted}`}>None selected</span>}
                     </div>
                   </div>
 
@@ -3597,13 +3593,7 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
         <Route path="/track" element={<TrackShipmentPageComponent theme={theme} isDarkMode={isDarkMode} />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/order" element={<OrderPlacementPage theme={theme} orderStepRef={orderStepRef} orderDataRef={orderDataRef} onOrder={() => navigate('/order')} />} />
-        <Route path="/dashboard" element={
-          isAuthenticated ? (
-            userType === 'user' ? <UserDashboard /> : <AdminDashboard />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        } />
+        <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="/ftl-details" element={<FtlDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
         <Route path="/ltl-details" element={<LtlDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
         <Route path="/refrigerated-details" element={<RefrigeratedDetailsPage onOrder={() => navigate('/order')} theme={theme} />} />
@@ -3625,8 +3615,8 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
       {/* @ts-expect-error - Web Component not recognized by React types */}
       <typelessity-widget
         config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
-        /* Local:      api-url="http://localhost:3000" */
-        /* Production: */ api-url="https://typelessity.vercel.app"
+        // api-url="http://localhost:3000"
+        api-url="https://typelessity.vercel.app"
         position="bottom-right"
       />
 

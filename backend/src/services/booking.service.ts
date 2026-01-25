@@ -13,8 +13,10 @@ import {
 
 export interface BookingRequest {
   cargoType?: string;
-  weight?: string;
-  dimensions?: string;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
   pickupAddress: string;
   deliveryAddress: string;
   pickupDate: string;
@@ -38,8 +40,10 @@ export interface BookingDetails {
   bookingId: string;
   confirmationNumber: string;
   cargoType?: string;
-  weight?: string;
-  dimensions?: string;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
   pickupAddress: string;
   deliveryAddress: string;
   pickupDate: string;
@@ -78,8 +82,10 @@ function rowToDetails(row: BookingRow): BookingDetails {
     bookingId: row.booking_id,
     confirmationNumber: row.confirmation_number,
     cargoType: row.cargo_type || undefined,
-    weight: row.weight || undefined,
-    dimensions: row.dimensions || undefined,
+    weight: row.weight ?? undefined,
+    length: row.length ?? undefined,
+    width: row.width ?? undefined,
+    height: row.height ?? undefined,
     pickupAddress: row.pickup_address,
     deliveryAddress: row.delivery_address,
     pickupDate: row.pickup_date,
@@ -203,7 +209,9 @@ export function createBooking(
     confirmationNumber,
     cargoType: data.cargoType,
     weight: data.weight,
-    dimensions: data.dimensions,
+    length: data.length,
+    width: data.width,
+    height: data.height,
     pickupAddress: data.pickupAddress,
     deliveryAddress: data.deliveryAddress,
     pickupDate: data.pickupDate,

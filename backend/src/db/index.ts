@@ -1,4 +1,4 @@
-import Database from 'better-sqlite3';
+import Database, { type Database as DatabaseType } from 'better-sqlite3';
 import fs from 'fs';
 import path from 'path';
 
@@ -10,7 +10,7 @@ if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const db = new Database(DB_PATH);
+const db: DatabaseType = new Database(DB_PATH);
 
 // Enable WAL mode for better concurrent access
 db.pragma('journal_mode = WAL');
@@ -25,8 +25,10 @@ export interface BookingRow {
   booking_id: string;
   confirmation_number: string;
   cargo_type: string | null;
-  weight: string | null;
-  dimensions: string | null;
+  weight: number | null;
+  length: number | null;
+  width: number | null;
+  height: number | null;
   pickup_address: string;
   delivery_address: string;
   pickup_date: string;
@@ -48,8 +50,10 @@ export interface CreateBookingData {
   bookingId: string;
   confirmationNumber: string;
   cargoType?: string;
-  weight?: string;
-  dimensions?: string;
+  weight?: number;
+  length?: number;
+  width?: number;
+  height?: number;
   pickupAddress: string;
   deliveryAddress: string;
   pickupDate: string;
@@ -81,12 +85,12 @@ export function findAllBookings(): BookingRow[] {
 export function createBooking(data: CreateBookingData): BookingRow {
   const stmt = db.prepare(`
     INSERT INTO bookings (
-      booking_id, confirmation_number, cargo_type, weight, dimensions,
+      booking_id, confirmation_number, cargo_type, weight, length, width, height,
       pickup_address, delivery_address, pickup_date, delivery_date,
       contact_name, contact_phone, contact_email, special_instructions,
       estimated_cost, idempotency_key, request_id
     ) VALUES (
-      @bookingId, @confirmationNumber, @cargoType, @weight, @dimensions,
+      @bookingId, @confirmationNumber, @cargoType, @weight, @length, @width, @height,
       @pickupAddress, @deliveryAddress, @pickupDate, @deliveryDate,
       @contactName, @contactPhone, @contactEmail, @specialInstructions,
       @estimatedCost, @idempotencyKey, @requestId
@@ -97,8 +101,10 @@ export function createBooking(data: CreateBookingData): BookingRow {
     bookingId: data.bookingId,
     confirmationNumber: data.confirmationNumber,
     cargoType: data.cargoType || null,
-    weight: data.weight || null,
-    dimensions: data.dimensions || null,
+    weight: data.weight ?? null,
+    length: data.length ?? null,
+    width: data.width ?? null,
+    height: data.height ?? null,
     pickupAddress: data.pickupAddress,
     deliveryAddress: data.deliveryAddress,
     pickupDate: data.pickupDate,

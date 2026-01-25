@@ -15,7 +15,13 @@ export interface BookingRow {
   pickup_address: string;
   delivery_address: string;
   pickup_date: string;
+  pickup_time: string | null;
   delivery_date: string | null;
+  service_type: string | null;
+  insurance: boolean;
+  packaging: boolean;
+  loading: boolean;
+  storage: boolean;
   contact_name: string | null;
   contact_phone: string | null;
   contact_email: string | null;

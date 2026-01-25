@@ -13,10 +13,10 @@ export function generateConfirmationNumber(): string {
   return result;
 }
 
-export function estimateCost(weight?: string): number {
+export function estimateCost(weight?: number): number {
   // Simple estimation based on weight
-  const weightNum = parseFloat(weight || '1000') || 1000;
-  const baseRate = 0.15; // $0.15 per lb
+  const weightNum = weight ?? 1000;
+  const baseRate = 0.15; // $0.15 per kg
   const baseCost = weightNum * baseRate;
 
   // Add minimum charge and round to 2 decimal places

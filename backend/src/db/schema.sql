@@ -5,8 +5,10 @@ CREATE TABLE IF NOT EXISTS bookings (
 
   -- Cargo details
   cargo_type VARCHAR(100),
-  weight VARCHAR(50),
-  dimensions VARCHAR(100),
+  weight DECIMAL(10,2),
+  length DECIMAL(10,2),
+  width DECIMAL(10,2),
+  height DECIMAL(10,2),
 
   -- Addresses
   pickup_address TEXT NOT NULL,

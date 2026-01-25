@@ -55,7 +55,7 @@ router.get('/', (_req: Request, res: Response) => {
 
 // GET /api/bookings/:id - Get single booking
 router.get('/:id', (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   try {
     const booking = getBookingById(id);

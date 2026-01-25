@@ -17,7 +17,17 @@ CREATE TABLE bookings (
 
   -- Dates
   pickup_date DATE NOT NULL,
+  pickup_time VARCHAR(10),
   delivery_date DATE,
+
+  -- Service
+  service_type VARCHAR(50),
+
+  -- Additional services (booleans)
+  insurance BOOLEAN DEFAULT FALSE,
+  packaging BOOLEAN DEFAULT FALSE,
+  loading BOOLEAN DEFAULT FALSE,
+  storage BOOLEAN DEFAULT FALSE,
 
   -- Contact
   contact_name VARCHAR(200),
