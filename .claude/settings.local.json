@@ -23,7 +23,10 @@
       "Bash(kill:*)",
       "Bash(git revert:*)",
       "Bash(git stash:*)",
-      "Bash(ps:*)"
+      "Bash(ps:*)",
+      "Bash(pnpm --filter @typelessity/widget build:*)",
+      "Bash(ls:*)",
+      "Bash(npx vite:*)"
     ],
     "deny": [],
     "ask": []
