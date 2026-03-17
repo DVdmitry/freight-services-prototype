@@ -3616,7 +3616,6 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
       <BookingNotification />
 
       {/* Typelessity AI Booking Widget */}
-      {/* @ts-expect-error - Web Component not recognized by React types */}
       {/*<typelessity-widget*/}
       {/*  config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"*/}
       {/*  api-url="http://localhost:3000"*/}
