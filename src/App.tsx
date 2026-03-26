@@ -1689,7 +1689,7 @@ const TransEdgeFreightApp = () => {
 
             {/* Typeless Form: AI voice form filling (this form only) */}
             {/* @ts-expect-error - Web Component not recognized by React types */}
-            <typeless-form api-key="tf_xbUaWZw944_xoBIPAK7SGBA4LCZ5JN59" position={{ left: 20, bottom: 20 }} />
+            <typeless-form api-key="tf_xbUaWZw944_xoBIPAK7SGBA4LCZ5JN59" />
           </div>
         </div>
       );
