@@ -1689,7 +1689,7 @@ const TransEdgeFreightApp = () => {
 
             {/* Typeless Form: AI voice form filling (this form only) */}
             {/* @ts-expect-error - Web Component not recognized by React types */}
-            <typeless-form api-key="tf_xbUaWZw944_xoBIPAK7SGBA4LCZ5JN59" />
+            <typeless-form api-key="tf_xbUaWZw944_xoBIPAK7SGBA4LCZ5JN59" position={{ left: 20, bottom: 20 }} />
           </div>
         </div>
       );
@@ -3616,12 +3616,12 @@ const BlogPage = ({ theme }: ThemedPageProps) => {
       <BookingNotification />
 
       {/* Typelessity AI Booking Widget */}
-      {/*<typelessity-widget*/}
-      {/*  config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"*/}
-      {/*  api-url="http://localhost:3000"*/}
-      {/*  // api-url="https://typelessity.vercel.app"*/}
-      {/*  position="bottom-left"*/}
-      {/*/>*/}
+      {/* @ts-expect-error - Web Component not recognized by React types */}
+      <typelessity-widget
+        config-id="b2c3d4e5-f6a7-8901-bcde-f23456789012"
+        api-url="https://typelessity.vercel.app"
+        position="bottom-left"
+      />
 
       <Footer />
     </div>
